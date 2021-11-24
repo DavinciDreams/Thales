@@ -1,4 +1,5 @@
-const { program } = require('commander');
+var inquirer = require('inquirer');
+require("dotenv").config();
 const axios = require('axios');
 const fs = require('fs');
 
@@ -6,16 +7,16 @@ const speakerName = "Lisa";
 const agentName = "Thales";
 
 // OPENAI TOKEN
-const API_TOKEN = "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";
-const conversationTextFile = __dirname + "/txt/conversation.txt";
-
+const API_TOKEN = process.env.OPENAI_API_KEY;
+console.log(API_TOKEN);
 const headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + API_TOKEN
 };
 
-const speakerModelFile = __dirname + "/txt/" + speakerName + "_model.txt";
-const speakerFactsFile= __dirname + "/txt/" + speakerName + "_facts.txt";
+const conversationTextFile = __dirname + "/../txt/conversation.txt";
+const speakerModelFile = __dirname + "/../txt/" + speakerName + "_model.txt";
+const speakerFactsFile= __dirname + "/../txt/" + speakerName + "_facts.txt";
 
 // If the file doesn't exist, write it
 if (!fs.existsSync(speakerFactsFile)) fs.writeFileSync(speakerFactsFile, "");
@@ -45,10 +46,38 @@ ${agentName}: Hello, ${speakerName}, it is nice to see you again as well.
 """
 `;
 
-program
-        .version('0.1.0')
-        .argument('<text>', 'text to send')
-        .action((text) => {
+const states = {
+        READY: "READY",
+        WAITING: "WAITING",
+        THINKING: "THINKING"
+}
+
+let currentState = states.READY;
+
+setInterval(() => {
+        // Are we thinking? return
+        // Are we waiting for input? return
+        if(currentState != states.READY) return;
+
+        console.log("currentState is");
+        console.log(currentState);
+        
+        var prompt = inquirer.createPromptModule();
+
+
+        const questions = [
+                {
+                  type: 'input',
+                  name: speakerName,
+                  message: ">>",
+                }
+        ];
+
+prompt(questions).then((text) => {
+                text = text[speakerName];
+                console.log("*******", text);
+                console.log("Doing stuff after");
+                currentState = states.THINKING;
                 const userInput = speakerName + ": " + text + "\n";
 
                 fs.appendFileSync(conversationTextFile, userInput);
@@ -89,14 +118,24 @@ program
 
                                         summarizeAndStoreFacts(text);
                                         formModelOfPerson();
+                                        currentState = states.READY;
                                 }
                         });
                 } catch (error) {
                         console.log("Error is", error);
                 }
-        });
 
-program.parse();
+        })
+        .catch((error) => {
+        if (error.isTtyError) {
+        // Prompt couldn't be rendered in the current environment
+        } else {
+        // Something else went wrong
+        }
+        });
+        currentState = states.WAITING;
+}, 50);
+
 
 function summarizeAndStoreFacts(speakerInput){
         // Take the input and send out a summary request
