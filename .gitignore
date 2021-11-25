@@ -1,3 +1,4 @@
 node_modules
 .env
-txt
+conversations/*.txt
+package-lock.json
