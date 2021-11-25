@@ -1,2 +1,0 @@
-These notes were taken by an AI chronicler who has superhuman recall and superintelligence. He records the lives of all beings faithfully in his ancient and leatherbound books, careful to note their lifes ambitions. 
-agentNameAmbitions= 

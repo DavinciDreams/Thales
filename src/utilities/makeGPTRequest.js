@@ -10,7 +10,7 @@ const headers = {
         'Authorization': 'Bearer ' + API_KEY
 };
 
-export async function makeGPTRequest(data, speakerName, agentName, engine) {
+export async function makeGPTRequest(data, speaker, agent, engine) {
         try {
                 const gptEngine = engine ?? "davinci";
                 const resp = await axios.post(
