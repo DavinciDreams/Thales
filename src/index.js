@@ -9,6 +9,8 @@ import { formModelOfPerson } from "./formModelOfPerson.js";
 
 import { replaceAll } from "./replaceAll.js";
 
+const updateModulo = 1; // Update the memory every X conversations
+
 let currentState = states.READY;
 
 prompt(namePrompt).then((text) => {
@@ -25,21 +27,25 @@ prompt(namePrompt).then((text) => {
                         text = text.Input;
                         currentState = states.THINKING;
                         const userInput = speakerName + ": " + text + "\n";
-                        const { conversationTextFile, speakerFactsFile } = getFilesForSpeaker(speakerName);
+                        const { conversationTextFile, speakerFactsFile, speakerMetaFile } = getFilesForSpeaker(speakerName);
+
+                        const meta = JSON.parse(fs.readFileSync(speakerMetaFile).toString());
+                        meta.messages = meta.messages + 1;
 
                         fs.appendFileSync(conversationTextFile, userInput);
                         const existingFacts = fs.readFileSync(speakerFactsFile).toString().trim();
                         // If no facts, don't inject
                         const facts = existingFacts == "" ? "\n" : `${agentName} knows the following information about ${speakerName}: ` + existingFacts + "\n";
 
+                        const conversation = fs.readFileSync(conversationTextFile).toString();
+
                         const context = personality + replaceAll(replaceAll(exampleDialog, "$agentName", agentName), "$speakerName", speakerName) + 
-                                fs.readFileSync(conversationTextFile).toString()
-                                + `${agentName}: `;
+                        conversation + `${agentName}: `;
 
                                 const data = {
                                         "prompt": context,
-                                        "temperature": 0.85,
-                                        "max_tokens": 1000,
+                                        "temperature": 0.5,
+                                        "max_tokens": 200,
                                         "top_p": 1,
                                         "frequency_penalty": 0.1,
                                         "stop": ["\"\"\"", `${speakerName}:`]
@@ -49,10 +55,14 @@ prompt(namePrompt).then((text) => {
                         const {success, choice } = response;
 
                         if(success) {
-                                fs.appendFileSync(conversationTextFile, `${agentName}: ${choice.text} \n`);
+                                fs.appendFileSync(conversationTextFile, `${agentName}: ${choice.text}`);
                                 console.log(`${agentName}: ${choice.text}`)
-                                // summarizeAndStoreFacts(speakerName, choice.text);
-                                // formModelOfPerson(speakerName);
+                                if(meta.messages % updateModulo == 0){
+                                        summarizeAndStoreFacts(speakerName, conversation);
+                                        formModelOfPerson(speakerName);
+                                }
+                                        fs.writeFileSync(speakerMetaFile, JSON.stringify(meta));
+
                                 currentState = states.READY;
                         } else {
                                 console.log("Error")

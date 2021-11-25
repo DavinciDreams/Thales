@@ -10,10 +10,11 @@ const headers = {
         'Authorization': 'Bearer ' + API_KEY
 };
 
-export async function makeGPTRequest(data, speakerName, agentName) {
+export async function makeGPTRequest(data, speakerName, agentName, engine) {
         try {
+                const gptEngine = engine ?? "davinci";
                 const resp = await axios.post(
-                        'https://api.openai.com/v1/engines/davinci/completions',
+                        `https://api.openai.com/v1/engines/${gptEngine}/completions`,
                         data,
                         { headers: headers }
                 );
