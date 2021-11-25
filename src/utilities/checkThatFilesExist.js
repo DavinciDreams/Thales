@@ -18,11 +18,16 @@ function makeDirectory(dir){
 export function checkThatFilesExist(speaker){
     makeDirectory(__dirname + "/conversations");
     makeDirectory(__dirname + "/conversations/" + speaker);
-    const { conversationTextFile, speakerModelFile, speakerFactsFile, speakerMetaFile } = getFilesForSpeaker(speaker);
+    makeDirectory(__dirname + "/conversations/" + speaker + "/history");
+
+    const { conversation, speakerModelFile, speakerFactsFile, conversationArchive, speakerModelArchive, speakerFactsArchive, speakerMeta }
+        = getFilesForSpeaker(speaker);
     // If the file doesn't exist, write it
     if (!fs.existsSync(speakerFactsFile)) fs.writeFileSync(speakerFactsFile, "");
+    if (!fs.existsSync(speakerFactsArchive)) fs.writeFileSync(speakerFactsArchive, "");
     if (!fs.existsSync(speakerModelFile)) fs.writeFileSync(speakerModelFile, "");
-    if (!fs.existsSync(conversationTextFile)) fs.writeFileSync(conversationTextFile, "");
-    if (!fs.existsSync(speakerMetaFile)) fs.writeFileSync(speakerMetaFile, JSON.stringify({ messages: 0 }));
-
+    if (!fs.existsSync(speakerModelArchive)) fs.writeFileSync(speakerModelArchive, "");
+    if (!fs.existsSync(conversation)) fs.writeFileSync(conversation, "");
+    if (!fs.existsSync(conversationArchive)) fs.writeFileSync(conversationArchive, "");
+    if (!fs.existsSync(speakerMeta)) fs.writeFileSync(speakerMeta, JSON.stringify({ messages: 0 }));
 }

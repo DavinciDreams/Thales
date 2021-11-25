@@ -6,16 +6,16 @@ import getFilesForSpeaker from "../utilities/getFilesForSpeaker.js";
 import { __dirname } from "../utilities/__dirname.js";
 
 export async function summarizeAndStoreFacts(speaker, agent, input) {
-    const factSummarizationPrompt = fs.readFileSync(__dirname + '/prompts/' + agent + '/fact_summarization.txt').toString().split("\n");
+    const factSummarizationPrompt = fs.readFileSync(__dirname + '/prompts/common/fact_summarization.txt').toString().split("\n");
     const { speakerFactsFile } = getFilesForSpeaker(speaker);
     // Take the input and send out a summary request
     const prompt = replaceAll(replaceAll(input + factSummarizationPrompt, "$speaker", speaker), "$agent", agent);
     const data = {
         "prompt": prompt,
-        "temperature": 0.2,
+        "temperature": 0.1,
         "max_tokens": 150,
         "top_p": 1,
-        "frequency_penalty": 0.0,
+        "frequency_penalty": 0.2,
         "stop": ["\"\"\"", "\n"]
     };
 

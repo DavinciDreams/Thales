@@ -10,6 +10,17 @@ npm install
 npm start // start with default agent
 ```
 
+1. Dump all except last 10 exchanges of conversation
+2. Dump all except last 10 facts
+3. Dump all except last 3 exchanges from model
+4. Add timestamps to conversations with []s
+5. Regex replace all timestamps on read so they don't exist
+6. Dump conversation more than a day old to a new file
+7. Check if it's a non-sequitor and if it's a statement or question, if non-sequitor dump to new file
+8. If it's a question, search long term memory (conversation + facts) for relevant information and save last search (clear on non-sequitor)
+9. Place relevant information into context
+10. Save each full call/response with timestamp to a folder in conversations
+
 ## TODO NOW
 - Dump old conversation into another file (append and clear) when no longer necessary
 - Handle non-sequitors
@@ -24,4 +35,8 @@ npm start // start with default agent
 - Agent handles multiple people in the room
 --audio i/o
 --(checks for context amd ranks)
+--agent pregenerates= speakerModel + expected response
+    compare expected response to speaker response 
+        rank and update speakerModel 
+
 

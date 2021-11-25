@@ -1,4 +1,4 @@
-import {config} from "dotenv";
+import { config } from "dotenv";
 config();
 
 import fs from 'fs';
@@ -39,23 +39,23 @@ prompt(namePrompt).then((text) => {
                         const monologue = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/monologue.txt').toString(), "$agent", agent);
                         const room = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/room.txt').toString(), "$agent", agent);
                         const actions = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/actions.txt').toString(), "$agent", agent);
-                        const factRecall = replaceAll(replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/fact_recall.txt').toString(), "$agent", agent), "$speaker", speaker);
+                        const factRecall = replaceAll(replaceAll(fs.readFileSync(__dirname + '/prompts/common/fact_recall.txt').toString(), "$agent", agent), "$speaker", speaker);
 
                         checkThatFilesExist(speaker);
                         text = text.Input;
                         currentState = states.THINKING;
                         const userInput = speaker + ": " + text + "\n";
-                        const { conversationTextFile, speakerFactsFile, speakerMetaFile } = getFilesForSpeaker(speaker);
+                        const { conversation: conversationText, speakerFactsFile, speakerMeta } = getFilesForSpeaker(speaker);
 
-                        const meta = JSON.parse(fs.readFileSync(speakerMetaFile).toString());
+                        const meta = JSON.parse(fs.readFileSync(speakerMeta).toString());
                         meta.messages = meta.messages + 1;
 
-                        fs.appendFileSync(conversationTextFile, userInput);
+                        fs.appendFileSync(conversationText, userInput);
                         const existingFacts = fs.readFileSync(speakerFactsFile).toString().trim();
                         // If no facts, don't inject
                         const facts = existingFacts == "" ? "" : factRecall + existingFacts + "\n";
 
-                        const conversation = fs.readFileSync(conversationTextFile).toString();
+                        const conversation = fs.readFileSync(conversationText).toString();
 
                         const context =
                                 room +
@@ -67,19 +67,19 @@ prompt(namePrompt).then((text) => {
                                 replaceAll(replaceAll(exampleDialog, "$agent", agent), "$speaker", speaker) +
                                 conversation + `${agent}: `;
 
-if(process.env.DEBUG){
-        console.log("*********************** CONTEXT");
-        console.log(context);
-        console.log("***********************");
+                        if (process.env.DEBUG) {
+                                console.log("*********************** CONTEXT");
+                                console.log(context);
+                                console.log("***********************");
 
-}
+                        }
 
                         const data = {
                                 "prompt": context,
-                                "temperature": 0.5,
+                                "temperature": 0.7,
                                 "max_tokens": 200,
                                 "top_p": 1,
-                                "frequency_penalty": 0.1,
+                                "frequency_penalty": 0.2,
                                 "stop": ["\"\"\"", `${speaker}:`, `\n`]
                         };
 
@@ -87,13 +87,13 @@ if(process.env.DEBUG){
                         const { success, choice } = response;
 
                         if (success) {
-                                fs.appendFileSync(conversationTextFile, `${agent}: ${choice.text}\n`);
+                                fs.appendFileSync(conversation, `${agent}: ${choice.text}\n`);
                                 console.log(`${agent}: ${choice.text}`)
                                 if (meta.messages % updateInterval == 0) {
                                         summarizeAndStoreFacts(speaker, agent, conversation);
                                         formModelOfPerson(speaker, agent);
                                 }
-                                fs.writeFileSync(speakerMetaFile, JSON.stringify(meta));
+                                fs.writeFileSync(speakerMeta, JSON.stringify(meta));
 
                                 currentState = states.READY;
                         } else {

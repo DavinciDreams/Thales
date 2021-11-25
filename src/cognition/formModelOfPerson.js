@@ -15,14 +15,14 @@ export async function formModelOfPerson(speaker, agent) {
         return questions[questionIndex];
     }
 
-    const { conversationTextFile, speakerModelFile, speakerFactsFile } = getFilesForSpeaker(speaker);
+    const { conversation, speakerModelFile, speakerFactsFile } = getFilesForSpeaker(speaker);
 
     // TODO: first we recall existing model of person
     const model = fs.readFileSync(speakerModelFile).toString();
     const facts = fs.readFileSync(speakerFactsFile).toString();
 
     // Then we want the model with the current conversationast 10 lines or so)assign userID
-    const currentConversation = fs.readFileSync(conversationTextFile).toString();
+    const currentConversation = fs.readFileSync(conversation).toString();
 
     const question = agent + ": " + getQuestion();
 
