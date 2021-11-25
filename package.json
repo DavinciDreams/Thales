@@ -2,7 +2,10 @@
   "name": "thales",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "start-thales": "AGENT=Thales node src/index.js",
+    "dev": "DEBUG=TRUE node src/index.js"
+
   },
   "type": "module",
   "license": "MIT",

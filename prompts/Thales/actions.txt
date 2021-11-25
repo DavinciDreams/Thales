@@ -1,0 +1,7 @@
+$agent can perform the following actions:
+$agent can [sit on couch]
+$agent can [dance]
+$agent can [wave]
+$agent can [smile]
+$agent can [frown]
+$agent can [stand up]

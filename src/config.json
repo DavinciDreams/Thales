@@ -1,4 +1,4 @@
 {
-    "agent":  "Thales",
+    "defaultAgent":  "Thales",
     "updateInterval": 3
 }

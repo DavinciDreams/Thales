@@ -1,16 +1,11 @@
 import axios from 'axios';
-import {config} from "dotenv";
-config();
-
-
-const API_KEY = process.env.OPENAI_API_KEY;
-
-const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + API_KEY
-};
 
 export async function makeGPTRequest(data, speaker, agent, engine) {
+        const API_KEY = process.env.OPENAI_API_KEY;
+        const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + API_KEY
+        };
         try {
                 const gptEngine = engine ?? "davinci";
                 const resp = await axios.post(

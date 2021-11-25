@@ -9,8 +9,6 @@ npm start
 ```
 
 ## TODO NOW
-- Extract personality of agent
-- Extract summarizer
 - Create a room context
 - Create an action context
 - Create needs and motivations context

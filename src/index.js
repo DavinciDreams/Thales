@@ -1,3 +1,6 @@
+import {config} from "dotenv";
+config();
+
 import fs from 'fs';
 import path from "path";
 
@@ -28,13 +31,15 @@ prompt(namePrompt).then((text) => {
                 // Are we waiting for input? return
                 if (currentState != states.READY) return;
                 prompt(questions).then(async (text) => {
-                        const { updateInterval, agent } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
-
-                        const personality = replaceAll(replaceAll(fs.readFileSync(__dirname + '/src/prompts/personality.txt').toString(), "$agent", agent), "$speaker", speaker);
-                        const exampleDialog = replaceAll(replaceAll(fs.readFileSync(__dirname + '/src/prompts/dialog.txt').toString(), "$agent", agent), "$speaker", speaker);
-                        const monologue = replaceAll(replaceAll(fs.readFileSync(__dirname + '/src/prompts/monologue.txt').toString(), "$agent", agent), "$speaker", speaker);
-                        const room = replaceAll(replaceAll(fs.readFileSync(__dirname + '/src/prompts/room.txt').toString(), "$agent", agent), "$speaker", speaker);
-                        const actions = replaceAll(replaceAll(fs.readFileSync(__dirname + '/src/prompts/actions.txt').toString(), "$agent", agent), "$speaker", speaker);
+                        const { updateInterval, defaultAgent } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
+                        const agent = process.env.AGENT ?? defaultAgent;
+                        const personality = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/personality.txt').toString(), "$agent", agent);
+                        const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent);
+                        const exampleDialog = replaceAll(replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/dialog.txt').toString(), "$agent", agent), "$speaker", speaker);
+                        const monologue = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/monologue.txt').toString(), "$agent", agent);
+                        const room = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/room.txt').toString(), "$agent", agent);
+                        const actions = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/actions.txt').toString(), "$agent", agent);
+                        const factRecall = replaceAll(replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/fact_recall.txt').toString(), "$agent", agent), "$speaker", speaker);
 
                         checkThatFilesExist(speaker);
                         text = text.Input;
@@ -48,11 +53,26 @@ prompt(namePrompt).then((text) => {
                         fs.appendFileSync(conversationTextFile, userInput);
                         const existingFacts = fs.readFileSync(speakerFactsFile).toString().trim();
                         // If no facts, don't inject
-                        const facts = existingFacts == "" ? "\n" : `${agent} knows the following information about ${speaker}: ` + existingFacts + "\n";
+                        const facts = existingFacts == "" ? "" : factRecall + existingFacts + "\n";
 
                         const conversation = fs.readFileSync(conversationTextFile).toString();
 
-                        const context = personality + replaceAll(replaceAll(exampleDialog, "$agent", agent), "$speaker", speaker) + conversation + `${agent}: `;
+                        const context =
+                                room +
+                                personality +
+                                needsAndMotivations +
+                                actions +
+                                facts +
+                                monologue +
+                                replaceAll(replaceAll(exampleDialog, "$agent", agent), "$speaker", speaker) +
+                                conversation + `${agent}: `;
+
+if(process.env.DEBUG){
+        console.log("*********************** CONTEXT");
+        console.log(context);
+        console.log("***********************");
+
+}
 
                         const data = {
                                 "prompt": context,
@@ -67,7 +87,7 @@ prompt(namePrompt).then((text) => {
                         const { success, choice } = response;
 
                         if (success) {
-                                fs.appendFileSync(conversationTextFile, `${agent}: ${choice.text}`);
+                                fs.appendFileSync(conversationTextFile, `${agent}: ${choice.text}\n`);
                                 console.log(`${agent}: ${choice.text}`)
                                 if (meta.messages % updateInterval == 0) {
                                         summarizeAndStoreFacts(speaker, agent, conversation);
