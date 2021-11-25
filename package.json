@@ -4,6 +4,7 @@
   "scripts": {
     "start": "node src/index.js",
     "start-thales": "AGENT=Thales node src/index.js",
+    "start-sherlock": "AGENT=Sherlock node src/index.js",
     "dev": "DEBUG=TRUE node src/index.js"
 
   },
