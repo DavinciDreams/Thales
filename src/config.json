@@ -1,4 +1,5 @@
 {
     "defaultAgent":  "Thales",
-    "updateInterval": 3
+    "updateInterval": 3,
+    "conversationWindowSize": 10
 }

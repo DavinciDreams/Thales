@@ -1,8 +1,1 @@
-$agent can perform the following actions:
-$agent can [sit on couch]
-$agent can [dance]
-$agent can [wave]
-$agent can [smile]
-$agent can [frown]
-$agent can [stand up]
-$agent can [smoke his pipe]
+$agent can perform the following actions: dance, wave, smile, frown, stand

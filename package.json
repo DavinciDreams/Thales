@@ -7,13 +7,13 @@
     "start-sherlock": "AGENT=Sherlock node src/index.js",
     "start-sagan": "AGENT=Sagan node src/index.js",
     "dev": "DEBUG=TRUE node src/index.js"
-
   },
   "type": "module",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",
     "commander": "^8.3.0",
+    "count-lines-in-file": "^1.1.0",
     "dotenv": "^10.0.0",
     "fuzzy-matching": "^0.4.3",
     "gtts": "^0.2.1",

@@ -14,6 +14,9 @@ import { __dirname } from "./utilities/__dirname.js";
 import { summarizeAndStoreFacts } from "./cognition/summarizeAndStoreFacts.js";
 import { formModelOfPerson } from "./cognition/formModelOfPerson.js";
 
+import countLinesInFile from 'count-lines-in-file';
+
+
 const states = {
         READY: "READY",
         WAITING: "WAITING",
@@ -31,7 +34,7 @@ prompt(namePrompt).then((text) => {
                 // Are we waiting for input? return
                 if (currentState != states.READY) return;
                 prompt(questions).then(async (text) => {
-                        const { updateInterval, defaultAgent } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
+                        const { updateInterval, defaultAgent, conversationWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
                         const agent = process.env.AGENT ?? defaultAgent;
                         const personality = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/personality.txt').toString(), "$agent", agent);
                         const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent);
@@ -45,7 +48,7 @@ prompt(namePrompt).then((text) => {
                         text = text.Input;
                         currentState = states.THINKING;
                         const userInput = speaker + ": " + text + "\n";
-                        const { conversation: conversationText, speakerFactsFile, speakerMeta } = getFilesForSpeaker(speaker);
+                        const { conversation: conversationText, conversationArchive, speakerFactsFile, speakerMeta } = getFilesForSpeaker(speaker);
 
                         const meta = JSON.parse(fs.readFileSync(speakerMeta).toString());
                         meta.messages = meta.messages + 1;
@@ -56,6 +59,16 @@ prompt(namePrompt).then((text) => {
                         const facts = existingFacts == "" ? "" : factRecall + existingFacts + "\n";
 
                         const conversation = fs.readFileSync(conversationText).toString();
+ 
+                        const conversationLines = conversation.split('\n');
+                        if(conversationLines.length > conversationWindowSize){
+                                const oldConversationLines = conversationLines.slice(0, -conversationWindowSize);
+                                const newConversationLines = conversationLines.slice(conversationWindowSize);
+                                fs.appendFileSync(conversationArchive, oldConversationLines.join("\n"));
+                                fs.writeFileSync(conversationText, newConversationLines.join("\n"));
+
+                                
+                        }
 
                         const context =
                                 room +
@@ -87,7 +100,7 @@ prompt(namePrompt).then((text) => {
                         const { success, choice } = response;
 
                         if (success) {
-                                fs.appendFileSync(conversation, `${agent}: ${choice.text}\n`);
+                                fs.appendFileSync(conversationText, `${agent}: ${choice.text}\n`);
                                 console.log(`${agent}: ${choice.text}`)
                                 if (meta.messages % updateInterval == 0) {
                                         summarizeAndStoreFacts(speaker, agent, conversation);

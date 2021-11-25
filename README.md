@@ -19,7 +19,9 @@ npm start // start with default agent
 7. Check if it's a non-sequitor and if it's a statement or question, if non-sequitor dump to new file
 8. If it's a question, search long term memory (conversation + facts) for relevant information and save last search (clear on non-sequitor)
 9. Place relevant information into context
-10. Save each full call/response with timestamp to a folder in conversations
+11. Separate facts from global
+
+;' facts about the world
 
 ## TODO NOW
 - Dump old conversation into another file (append and clear) when no longer necessary
