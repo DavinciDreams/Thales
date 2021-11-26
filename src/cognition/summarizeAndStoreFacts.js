@@ -1,13 +1,13 @@
 import fs from "fs";
 import { makeGPTRequest } from "../utilities/makeGPTRequest.js";
 import { replaceAll } from "../utilities/replaceAll.js";
-import getFilesForSpeaker from "../utilities/getFilesForSpeaker.js";
+import getFilesForSpeakerAndAgent from "../utilities/getFilesForSpeakerAndAgent.js";
 
 import { __dirname } from "../utilities/__dirname.js";
 
 export async function summarizeAndStoreFacts(speaker, agent, input) {
     const factSummarizationPrompt = fs.readFileSync(__dirname + '/agents/common/fact_summarization.txt').toString().split("\n");
-    const { speakerFactsFile } = getFilesForSpeaker(speaker);
+    const { speakerFactsFile } = getFilesForSpeakerAndAgent(speaker, agent);
     // Take the input and send out a summary request
     const prompt = replaceAll(replaceAll(input + factSummarizationPrompt, "$speaker", speaker), "$agent", agent);
     const data = {

@@ -1,5 +1,5 @@
 import fs from "fs";
-import getFilesForSpeaker from "./getFilesForSpeaker.js";
+import getFilesForSpeakerAndAgent from "./getFilesForSpeakerAndAgent.js";
 import { __dirname } from "./__dirname.js";
 const { updateInterval, agent } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
 
@@ -15,13 +15,14 @@ function makeDirectory(dir){
     }
 }
 
-export function checkThatFilesExist(speaker){
+export function checkThatFilesExist(speaker, agent){
     makeDirectory(__dirname + "/conversations");
-    makeDirectory(__dirname + "/conversations/" + speaker);
-    makeDirectory(__dirname + "/conversations/" + speaker + "/history");
+    makeDirectory(__dirname + "/conversations/" + agent);
+    makeDirectory(__dirname + "/conversations/" + agent + "/" + speaker);
+    makeDirectory(__dirname + "/conversations/" + agent + "/" + speaker + "/history");
 
     const { conversation, speakerModelFile, speakerFactsFile, conversationArchive, speakerModelArchive, speakerFactsArchive, speakerMeta }
-        = getFilesForSpeaker(speaker);
+        = getFilesForSpeakerAndAgent(speaker, agent);
     // If the file doesn't exist, write it
     if (!fs.existsSync(speakerFactsFile)) fs.writeFileSync(speakerFactsFile, "");
     if (!fs.existsSync(speakerFactsArchive)) fs.writeFileSync(speakerFactsArchive, "");

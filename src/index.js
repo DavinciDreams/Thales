@@ -3,7 +3,7 @@ config();
 
 import fs from 'fs';
 import { checkThatFilesExist } from "./utilities/checkThatFilesExist.js";
-import getFilesForSpeaker from "./utilities/getFilesForSpeaker.js";
+import getFilesForSpeakerAndAgent from "./utilities/getFilesForSpeakerAndAgent.js";
 import { makeGPTRequest } from "./utilities//makeGPTRequest.js";
 import { replaceAll } from "./utilities/replaceAll.js";
 import { __dirname } from "./utilities/__dirname.js";
@@ -66,15 +66,15 @@ function startloop(speaker){
                                 const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent) + "\n";
                                 const exampleDialog = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/dialog.txt').toString(), "$agent", agent), "$speaker", speaker) + "\n";
                                 const monologue = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/monologue.txt').toString(), "$agent", agent) + "\n";
-                                const room = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/room.txt').toString(), "$agent", agent) + "\n";
+                                const room = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/room.txt').toString(), "$agent", agent), "$speaker", speaker) + "\n";
                                 const actions = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/actions.txt').toString(), "$agent", agent) + "\n";
                                 const factRecall = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/common/fact_recall.txt').toString(), "$agent", agent), "$speaker", speaker) + "\n";
         
-                                checkThatFilesExist(speaker);
+                                checkThatFilesExist(speaker, agent);
                                 text = text.Input;
                                 currentState = states.THINKING;
                                 const userInput = speaker + ": " + text + "\n";
-                                const { conversation: conversationText, conversationArchive, speakerFactsFile, speakerMeta } = getFilesForSpeaker(speaker);
+                                const { conversation: conversationText, conversationArchive, speakerFactsFile, speakerMeta } = getFilesForSpeakerAndAgent(speaker, agent);
         
                                 const meta = JSON.parse(fs.readFileSync(speakerMeta).toString());
                                 meta.messages = meta.messages + 1;

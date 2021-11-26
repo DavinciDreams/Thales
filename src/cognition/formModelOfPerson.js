@@ -1,7 +1,7 @@
 
 import fs from "fs";
 import { makeGPTRequest } from "../utilities/makeGPTRequest.js";
-import getFilesForSpeaker from "../utilities/getFilesForSpeaker.js";
+import getFilesForSpeakerAndAgent from "../utilities/getFilesForSpeakerAndAgent.js";
 import { replaceAll } from "../utilities/replaceAll.js";
 import { __dirname } from "../utilities/__dirname.js";
 
@@ -15,7 +15,7 @@ export async function formModelOfPerson(speaker, agent) {
         return questions[questionIndex];
     }
 
-    const { conversation, speakerModelFile, speakerFactsFile } = getFilesForSpeaker(speaker);
+    const { conversation, speakerModelFile, speakerFactsFile } = getFilesForSpeakerAndAgent(speaker, agent);
 
     // TODO: first we recall existing model of person
     const model = fs.readFileSync(speakerModelFile).toString();

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import fs from 'fs';
-import getDirectoryForSpeaker from "./getDirectoryForSpeaker.js";
+import { __dirname } from "./__dirname.js";
+
 export async function makeGPTRequest(data, speaker, agent, engine) {
         const API_KEY = process.env.OPENAI_API_KEY;
         const headers = {
@@ -17,7 +18,8 @@ export async function makeGPTRequest(data, speaker, agent, engine) {
 
                 if (resp.data.choices && resp.data.choices.length > 0) {
                         let choice = resp.data.choices[0];
-                        fs.writeFileSync(getDirectoryForSpeaker(speaker) + "/history/" + Date.now() + ".txt", data.prompt + choice.text);
+                        const dir = __dirname + "/conversations/" + agent + "/" + speaker;
+                        fs.writeFileSync(dir + "/history/" + Date.now() + ".txt", data.prompt + choice.text);
                         return { success: true, choice };
         
                 }
