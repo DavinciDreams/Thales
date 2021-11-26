@@ -8,7 +8,9 @@ import { makeGPTRequest } from "./utilities//makeGPTRequest.js";
 import { replaceAll } from "./utilities/replaceAll.js";
 import { __dirname } from "./utilities/__dirname.js";
 
-import { summarizeAndStoreFacts } from "./cognition/summarizeAndStoreFacts.js";
+import { summarizeAndStoreFactsAboutSpeaker } from "./cognition/summarizeAndStoreFactsAboutSpeaker.js";
+import { summarizeAndStoreFactsAboutAgent } from "./cognition/summarizeAndStoreFactsAboutAgent.js";
+
 import { formModelOfPerson } from "./cognition/formModelOfPerson.js";
 
 import inquirer from 'inquirer';
@@ -60,7 +62,7 @@ function startloop(speaker){
                                 }
                         ];
                         prompt(questions).then(async (text) => {
-                                const { factsUpdateInterval, modelUpdateInterval, defaultAgent, conversationWindowSize, factsWindowSize, modelWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
+                                const { factsUpdateInterval, modelUpdateInterval, defaultAgent, conversationWindowSize, speakerFactsWindowSize, agentFactsWindowSize, modelWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
                                 const agent = process.env.AGENT ?? defaultAgent;
                                 const personality = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/personality.txt').toString(), "$agent", agent) + "\n";
                                 const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent) + "\n";
@@ -68,21 +70,27 @@ function startloop(speaker){
                                 const monologue = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/monologue.txt').toString(), "$agent", agent) + "\n";
                                 const room = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/room.txt').toString(), "$agent", agent), "$speaker", speaker) + "\n";
                                 const actions = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/actions.txt').toString(), "$agent", agent) + "\n";
-                                const factRecall = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/common/fact_recall.txt').toString(), "$agent", agent), "$speaker", speaker) + "\n";
         
                                 checkThatFilesExist(speaker, agent);
                                 text = text.Input;
                                 currentState = states.THINKING;
                                 const userInput = speaker + ": " + text + "\n";
-                                const { conversation: conversationText, conversationArchive, speakerFactsFile, speakerModelFile, speakerModelArchive, speakerFactsArchive, speakerMeta } = getFilesForSpeakerAndAgent(speaker, agent);
+                                const {
+                                        conversation: conversationText,
+                                        conversationArchive,
+                                        speakerFactsFile,
+                                        speakerFactsArchive,
+                                        speakerModelFile,
+                                        speakerModelArchive,
+                                        agentFactsFile,
+                                        agentFactsArchive,
+                                        speakerMeta
+                                } = getFilesForSpeakerAndAgent(speaker, agent);
         
                                 const meta = JSON.parse(fs.readFileSync(speakerMeta).toString());
                                 meta.messages = meta.messages + 1;
         
                                 fs.appendFileSync(conversationText, userInput);
-                                const existingFacts = fs.readFileSync(speakerFactsFile).toString().trim() + "\n";
-                                // If no facts, don't inject
-                                const facts = existingFacts == "" ? "" : factRecall + existingFacts + "\n";
         
                                 const conversation = fs.readFileSync(conversationText).toString() + "\n";
          
@@ -95,21 +103,30 @@ function startloop(speaker){
                                         fs.writeFileSync(conversationText, newConversationLines.join("\n"));      
                                 }
 
-                                // Slice the facts and store any more than the window size in the archive
-                                const factsLines = facts.split('\n');
-                                if(factsLines.length > factsWindowSize){
-                                        const oldFactsLines = factsLines.slice(0, -conversationWindowSize);
-                                        const newFactsLines = factsLines.slice(conversationWindowSize);
-                                        fs.appendFileSync(speakerFactsArchive, oldFactsLines.join("\n"));
-                                        fs.writeFileSync(speakerFactsFile, newFactsLines.join("\n"));      
+                                const existingFacts = fs.readFileSync(speakerFactsFile).toString().trim();
+                                let facts = existingFacts == "" ? "" : existingFacts + "\n"; // If no facts, don't inject
+                                let factsLines = facts.split('\n');  // Slice the facts and store any more than the window size in the archive
+
+                                if(factsLines.length > speakerFactsWindowSize){
+                                        fs.appendFileSync(speakerFactsArchive, factsLines.slice(0, -speakerFactsWindowSize).join("\n"));
+                                        fs.writeFileSync(speakerFactsFile, factsLines.slice(speakerFactsWindowSize).join("\n"));      
+                                }
+
+                                const existingAgentFacts = fs.readFileSync(agentFactsFile).toString().trim();
+                                facts = existingAgentFacts == "" ? "" : existingAgentFacts + "\n"; // If no facts, don't inject
+                                factsLines = facts.split('\n'); // Slice the facts and store any more than the window size in the archive
+
+                                if(factsLines.length > agentFactsWindowSize){
+                                        fs.appendFileSync(agentFactsArchive, factsLines.slice(0, -agentFactsWindowSize).join("\n"));
+                                        fs.writeFileSync(agentFactsFile, factsLines.slice(agentFactsWindowSize).join("\n"));      
                                 }
 
                                 // Slice the model and store any more than the window size in the archive
                                 const model = fs.readFileSync(speakerModelFile).toString().trim() + "\n";
                                 const modelLines = model.split('\n');
                                 if(modelLines.length > modelWindowSize){
-                                        const oldModelLines = modelLines.slice(0, -conversationWindowSize);
-                                        const newModelLines = modelLines.slice(conversationWindowSize);
+                                        const oldModelLines = modelLines.slice(0, -modelWindowSize);
+                                        const newModelLines = modelLines.slice(modelWindowSize);
                                         fs.appendFileSync(speakerModelArchive, oldModelLines.join("\n"));
                                         fs.writeFileSync(speakerModelFile, newModelLines.join("\n"));      
                                 }
@@ -141,14 +158,15 @@ function startloop(speaker){
                                         "stop": ["\"\"\"", `${speaker}:`, `\n`]
                                 };
         
-                                const response = await makeGPTRequest(data, speaker, agent);
-                                const { success, choice } = response;
+                                const { success, choice } = await makeGPTRequest(data, speaker, agent);
+                                summarizeAndStoreFactsAboutAgent(speaker, agent, choice.text);
+
         
                                 if (success) {
                                         fs.appendFileSync(conversationText, `${agent}: ${choice.text}\n`);
                                         console.log(`${agent}: ${choice.text}`)
                                         if (meta.messages % factsUpdateInterval == 0) {
-                                                summarizeAndStoreFacts(speaker, agent, conversation);
+                                                summarizeAndStoreFactsAboutSpeaker(speaker, agent, conversation);
                                         }
                                         if (meta.messages % modelUpdateInterval == 0) {
                                                 formModelOfPerson(speaker, agent);

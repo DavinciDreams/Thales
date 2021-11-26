@@ -30,17 +30,13 @@ You can create your own agent entirely by modifying the text prompts, without ne
 Here's a great place to start on your prompt engineering journey: https://www.gwern.net/GPT-3
 
 ## TODO (In Progress)
-1. Dump all except last 10 exchanges of conversation
-2. Dump all except last 10 facts
-3. Dump all except last 3 exchanges from model
-4. Add timestamps to conversations with []s
-5. Regex replace all timestamps on read so they don't exist
-6. Dump conversation more than a day old to a new file
-7. Check if it's a non-sequitor and if it's a statement or question, if non-sequitor dump to new file
-8. If it's a question, search long term memory (conversation + facts) for relevant information and save last search (clear on non-sequitor)
-9. Place relevant information into context
-11. Separate facts from global facts about the world
-12. 
+- Check if it's a non-sequitor and if it's a statement or question, if non-sequitor dump to new file
+- If it's a question, search long term memory (conversation + facts) for relevant information and save last search (clear on non-sequitor)
+- Add timestamps to conversations with []s
+- Regex replace all timestamps on read so they don't exist
+- Dump conversation more than a day old to a new file
+- Place relevant information into context
+- Separate facts from global facts about the world 
 - Dump old conversation into another file (append and clear) when no longer necessary
 - Handle non-sequitors
 - Handle long spaces in time of conversation -- timestamp conversations

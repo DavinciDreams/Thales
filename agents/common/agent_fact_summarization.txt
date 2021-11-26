@@ -1,0 +1,2 @@
+Summarize the facts about $agent from the conversation above:
+$agent

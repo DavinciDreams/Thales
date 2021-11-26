@@ -1,6 +1,7 @@
 import axios from 'axios';
 import fs from 'fs';
 import { __dirname } from "./__dirname.js";
+import { summarizeAndStoreFactsAboutAgent } from "../cognition/summarizeAndStoreFactsAboutAgent.js";
 
 export async function makeGPTRequest(data, speaker, agent, engine) {
         const API_KEY = process.env.OPENAI_API_KEY;
@@ -9,7 +10,7 @@ export async function makeGPTRequest(data, speaker, agent, engine) {
                 'Authorization': 'Bearer ' + API_KEY
         };
         try {
-                const gptEngine = engine ?? "davinci";
+                const gptEngine = engine ?? JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString()).summarizationModel;
                 const resp = await axios.post(
                         `https://api.openai.com/v1/engines/${gptEngine}/completions`,
                         data,
@@ -20,6 +21,7 @@ export async function makeGPTRequest(data, speaker, agent, engine) {
                         let choice = resp.data.choices[0];
                         const dir = __dirname + "/conversations/" + agent + "/" + speaker;
                         fs.writeFileSync(dir + "/history/" + Date.now() + ".txt", data.prompt + choice.text);
+                        
                         return { success: true, choice };
         
                 }

@@ -20,11 +20,13 @@ export function checkThatFilesExist(speaker, agent){
     makeDirectory(__dirname + "/conversations/" + agent + "/" + speaker);
     makeDirectory(__dirname + "/conversations/" + agent + "/" + speaker + "/history");
 
-    const { conversation, speakerModelFile, speakerFactsFile, conversationArchive, speakerModelArchive, speakerFactsArchive, speakerMeta }
+    const { conversation, speakerModelFile, speakerFactsFile, agentFactsFile, agentFactsArchive, conversationArchive, speakerModelArchive, speakerFactsArchive, speakerMeta }
         = getFilesForSpeakerAndAgent(speaker, agent);
     // If the file doesn't exist, write it
     if (!fs.existsSync(speakerFactsFile)) fs.writeFileSync(speakerFactsFile, "");
     if (!fs.existsSync(speakerFactsArchive)) fs.writeFileSync(speakerFactsArchive, "");
+    if (!fs.existsSync(agentFactsFile)) fs.writeFileSync(agentFactsFile, "");
+    if (!fs.existsSync(agentFactsArchive)) fs.writeFileSync(agentFactsArchive, "");
     if (!fs.existsSync(speakerModelFile)) fs.writeFileSync(speakerModelFile, "");
     if (!fs.existsSync(speakerModelArchive)) fs.writeFileSync(speakerModelArchive, "");
     if (!fs.existsSync(conversation)) fs.writeFileSync(conversation, "");
