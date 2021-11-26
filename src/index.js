@@ -36,13 +36,13 @@ prompt(namePrompt).then((text) => {
                 prompt(questions).then(async (text) => {
                         const { updateInterval, defaultAgent, conversationWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
                         const agent = process.env.AGENT ?? defaultAgent;
-                        const personality = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/personality.txt').toString(), "$agent", agent);
-                        const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent);
-                        const exampleDialog = replaceAll(replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/dialog.txt').toString(), "$agent", agent), "$speaker", speaker);
-                        const monologue = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/monologue.txt').toString(), "$agent", agent);
-                        const room = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/room.txt').toString(), "$agent", agent);
-                        const actions = replaceAll(fs.readFileSync(__dirname + '/prompts/' + agent + '/actions.txt').toString(), "$agent", agent);
-                        const factRecall = replaceAll(replaceAll(fs.readFileSync(__dirname + '/prompts/common/fact_recall.txt').toString(), "$agent", agent), "$speaker", speaker);
+                        const personality = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/personality.txt').toString(), "$agent", agent);
+                        const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent);
+                        const exampleDialog = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/dialog.txt').toString(), "$agent", agent), "$speaker", speaker);
+                        const monologue = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/monologue.txt').toString(), "$agent", agent);
+                        const room = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/room.txt').toString(), "$agent", agent);
+                        const actions = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/actions.txt').toString(), "$agent", agent);
+                        const factRecall = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/common/fact_recall.txt').toString(), "$agent", agent), "$speaker", speaker);
 
                         checkThatFilesExist(speaker);
                         text = text.Input;
