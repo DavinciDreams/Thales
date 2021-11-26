@@ -1,5 +1,5 @@
 {
-    "defaultAgent":  "Thales",
+    "defaultAgent": "Thales",
     "factsUpdateInterval": 2,
     "modelUpdateInterval": 4,
     "conversationWindowSize": 10,
@@ -7,5 +7,5 @@
     "agentFactsWindowSize": 20,
     "modelWindowSize": 4,
     "summarizationModel": "ada",
-    "conversationModel": "davinci"
+    "conversationModel": "curie"
 }
