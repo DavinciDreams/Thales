@@ -35,7 +35,22 @@ const states = {
 
 let currentState = states.READY;
 
+const router = express.Router();
+router.use(urlencoded({ extended: false }));
+const app = express()
+app.use(json())
+
+app.route('/msg').post((req, res) => {
+const message = req.body.message
+const sender = req.body.sender
+console.log('request: ' + JSON.stringify(req.body))
+handleMessage(message, sender, res)
+});
+
+app.listen(process.env.WEBSERVER_PORT, () => { console.log(`Server listening on http://localhost:${process.env.WEBSERVER_PORT}`); })
+
 if(process.env.TERMINAL){
+        setTimeout(() => {
         // If speaker was provided, start the request loop
         if(process.env.SPEAKER){
                 startloop(process.env.SPEAKER);
@@ -51,6 +66,7 @@ if(process.env.TERMINAL){
                         startloop(text.Name);
                 });
         }
+        }, 100)
 }
 
 function startloop(speaker){
@@ -73,26 +89,8 @@ function startloop(speaker){
                 }, 50);
 }
 
-async function createWebServer() {
-    const router = express.Router();
-    router.use(urlencoded({ extended: false }));
-    const app = express()
-    app.use(json())
-   
-    app.route('/msg').post((req, res) => {
-        const message = req.body.message
-        const sender = req.body.sender
-        console.log('request: ' + JSON.stringify(req.body))
-        handleMessage(message, sender, res)
-    });
-
-    app.listen(process.env.WEBSERVER_PORT, () => { console.log(`Server listening on http://localhost:${process.env.WEBSERVER_PORT}`); })
-}
-
-createWebServer()
-
 const senders = {}
-export async function handleMessage(message, speaker, res) {
+async function handleMessage(message, speaker, res) {
                 if (senders[speaker] === undefined) senders[speaker] = states.READY;
                 while (senders[speaker] != states.READY) {console.log('state: ' + senders[speaker]);}
 
