@@ -1,5 +1,8 @@
 {
     "defaultAgent":  "Thales",
-    "updateInterval": 3,
-    "conversationWindowSize": 10
+    "factsUpdateInterval": 2,
+    "modelUpdateInterval": 4,
+    "conversationWindowSize": 10,
+    "factwindowSize": 10,
+    "modelWindowSize": 5
 }

@@ -1,7 +1,6 @@
 import fs from "fs";
 import getFilesForSpeakerAndAgent from "./getFilesForSpeakerAndAgent.js";
 import { __dirname } from "./__dirname.js";
-const { updateInterval, agent } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
 
 function makeDirectory(dir){
     // create new directory

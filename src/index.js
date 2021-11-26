@@ -60,7 +60,7 @@ function startloop(speaker){
                                 }
                         ];
                         prompt(questions).then(async (text) => {
-                                const { updateInterval, defaultAgent, conversationWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
+                                const { factsUpdateInterval, modelUpdateInterval, defaultAgent, conversationWindowSize, factsWindowSize, modelWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
                                 const agent = process.env.AGENT ?? defaultAgent;
                                 const personality = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/personality.txt').toString(), "$agent", agent) + "\n";
                                 const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent) + "\n";
@@ -74,7 +74,7 @@ function startloop(speaker){
                                 text = text.Input;
                                 currentState = states.THINKING;
                                 const userInput = speaker + ": " + text + "\n";
-                                const { conversation: conversationText, conversationArchive, speakerFactsFile, speakerMeta } = getFilesForSpeakerAndAgent(speaker, agent);
+                                const { conversation: conversationText, conversationArchive, speakerFactsFile, speakerModelFile, speakerModelArchive, speakerFactsArchive, speakerMeta } = getFilesForSpeakerAndAgent(speaker, agent);
         
                                 const meta = JSON.parse(fs.readFileSync(speakerMeta).toString());
                                 meta.messages = meta.messages + 1;
@@ -86,16 +86,34 @@ function startloop(speaker){
         
                                 const conversation = fs.readFileSync(conversationText).toString() + "\n";
          
+                                // Slice the conversation and store any more than the window size in the archive
                                 const conversationLines = conversation.split('\n');
                                 if(conversationLines.length > conversationWindowSize){
                                         const oldConversationLines = conversationLines.slice(0, -conversationWindowSize);
                                         const newConversationLines = conversationLines.slice(conversationWindowSize);
                                         fs.appendFileSync(conversationArchive, oldConversationLines.join("\n"));
-                                        fs.writeFileSync(conversationText, newConversationLines.join("\n"));
-        
-                                        
+                                        fs.writeFileSync(conversationText, newConversationLines.join("\n"));      
                                 }
-        
+
+                                // Slice the facts and store any more than the window size in the archive
+                                const factsLines = facts.split('\n');
+                                if(factsLines.length > factsWindowSize){
+                                        const oldFactsLines = factsLines.slice(0, -conversationWindowSize);
+                                        const newFactsLines = factsLines.slice(conversationWindowSize);
+                                        fs.appendFileSync(speakerFactsArchive, oldFactsLines.join("\n"));
+                                        fs.writeFileSync(speakerFactsFile, newFactsLines.join("\n"));      
+                                }
+
+                                // Slice the model and store any more than the window size in the archive
+                                const model = fs.readFileSync(speakerModelFile).toString().trim() + "\n";
+                                const modelLines = model.split('\n');
+                                if(modelLines.length > modelWindowSize){
+                                        const oldModelLines = modelLines.slice(0, -conversationWindowSize);
+                                        const newModelLines = modelLines.slice(conversationWindowSize);
+                                        fs.appendFileSync(speakerModelArchive, oldModelLines.join("\n"));
+                                        fs.writeFileSync(speakerModelFile, newModelLines.join("\n"));      
+                                }
+
                                 const context =
                                         room +
                                         personality +
@@ -103,6 +121,7 @@ function startloop(speaker){
                                         actions +
                                         facts +
                                         monologue +
+                                        model +
                                         replaceAll(replaceAll(exampleDialog, "$agent", agent), "$speaker", speaker) +
                                         conversation + `${agent}: `;
         
@@ -128,8 +147,10 @@ function startloop(speaker){
                                 if (success) {
                                         fs.appendFileSync(conversationText, `${agent}: ${choice.text}\n`);
                                         console.log(`${agent}: ${choice.text}`)
-                                        if (meta.messages % updateInterval == 0) {
+                                        if (meta.messages % factsUpdateInterval == 0) {
                                                 summarizeAndStoreFacts(speaker, agent, conversation);
+                                        }
+                                        if (meta.messages % modelUpdateInterval == 0) {
                                                 formModelOfPerson(speaker, agent);
                                         }
                                         fs.writeFileSync(speakerMeta, JSON.stringify(meta));

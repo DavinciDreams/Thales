@@ -26,6 +26,8 @@ export async function formModelOfPerson(speaker, agent) {
 
     const question = agent + ": " + getQuestion();
 
+    console.log("************* question", question)
+
     const prompt = currentConversation + facts + model + "\n" + replaceAll(question + "\n" + speaker + ": ", "$speaker", speaker);
     const data = {
         "prompt": prompt,
