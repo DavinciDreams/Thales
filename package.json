@@ -3,17 +3,17 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "start-thales": "AGENT=Thales node src/index.js",
-    "start-sherlock": "AGENT=Sherlock node src/index.js",
-    "start-sagan": "AGENT=Sagan node src/index.js",
-    "dev": "DEBUG=TRUE node src/index.js"
+    "start-thales": "cross-env AGENT=Thales node src/index.js",
+    "start-sherlock": "cross-env AGENT=Sherlock node src/index.js",
+    "start-sagan": "cross-env AGENT=Sagan node src/index.js",
+    "dev": "cross-env DEBUG=TRUE AGENT=Thales SPEAKER=Lisa node src/index.js"
   },
   "type": "module",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",
     "commander": "^8.3.0",
-    "count-lines-in-file": "^1.1.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "fuzzy-matching": "^0.4.3",
     "gtts": "^0.2.1",
