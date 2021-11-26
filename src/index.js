@@ -64,6 +64,8 @@ function startloop(speaker){
                         prompt(questions).then(async (text) => {
                                 const { factsUpdateInterval, modelUpdateInterval, defaultAgent, conversationWindowSize, speakerFactsWindowSize, agentFactsWindowSize, modelWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
                                 const agent = process.env.AGENT ?? defaultAgent;
+                                const morals = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/common/morals.txt').toString(), "$agent", agent), "$speaker", speaker)  + "\n";
+                                const ethics = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/ethics.txt').toString(), "$agent", agent), "$speaker", speaker)  + "\n";
                                 const personality = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/personality.txt').toString(), "$agent", agent) + "\n";
                                 const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent) + "\n";
                                 const exampleDialog = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/dialog.txt').toString(), "$agent", agent), "$speaker", speaker) + "\n";
@@ -103,22 +105,22 @@ function startloop(speaker){
                                         fs.writeFileSync(conversationText, newConversationLines.join("\n"));      
                                 }
 
-                                const existingFacts = fs.readFileSync(speakerFactsFile).toString().trim();
-                                let facts = existingFacts == "" ? "" : existingFacts + "\n"; // If no facts, don't inject
-                                let factsLines = facts.split('\n');  // Slice the facts and store any more than the window size in the archive
+                                const existingSpeakerFacts = fs.readFileSync(speakerFactsFile).toString().trim();
+                                const speakerFacts = existingSpeakerFacts == "" ? "" : existingSpeakerFacts + "\n"; // If no facts, don't inject
+                                const speakerFactsLines = speakerFacts.split('\n');  // Slice the facts and store any more than the window size in the archive
 
-                                if(factsLines.length > speakerFactsWindowSize){
-                                        fs.appendFileSync(speakerFactsArchive, factsLines.slice(0, -speakerFactsWindowSize).join("\n"));
-                                        fs.writeFileSync(speakerFactsFile, factsLines.slice(speakerFactsWindowSize).join("\n"));      
+                                if(speakerFactsLines.length > speakerFactsWindowSize){
+                                        fs.appendFileSync(speakerFactsArchive, speakerFactsLines.slice(0, -speakerFactsWindowSize).join("\n"));
+                                        fs.writeFileSync(speakerFactsFile, speakerFactsLines.slice(speakerFactsWindowSize).join("\n"));      
                                 }
 
                                 const existingAgentFacts = fs.readFileSync(agentFactsFile).toString().trim();
-                                facts = existingAgentFacts == "" ? "" : existingAgentFacts + "\n"; // If no facts, don't inject
-                                factsLines = facts.split('\n'); // Slice the facts and store any more than the window size in the archive
+                                const agentFacts = existingAgentFacts == "" ? "" : existingAgentFacts + "\n"; // If no facts, don't inject
+                                const agentFactsLines = agentFacts.split('\n'); // Slice the facts and store any more than the window size in the archive
 
-                                if(factsLines.length > agentFactsWindowSize){
-                                        fs.appendFileSync(agentFactsArchive, factsLines.slice(0, -agentFactsWindowSize).join("\n"));
-                                        fs.writeFileSync(agentFactsFile, factsLines.slice(agentFactsWindowSize).join("\n"));      
+                                if(agentFactsLines.length > agentFactsWindowSize){
+                                        fs.appendFileSync(agentFactsArchive, agentFactsLines.slice(0, -agentFactsWindowSize).join("\n"));
+                                        fs.writeFileSync(agentFactsFile, agentFactsLines.slice(agentFactsWindowSize).join("\n"));      
                                 }
 
                                 // Slice the model and store any more than the window size in the archive
@@ -133,10 +135,13 @@ function startloop(speaker){
 
                                 const context =
                                         room +
+                                        actions +
                                         personality +
                                         needsAndMotivations +
-                                        actions +
-                                        facts +
+                                        morals +
+                                        ethics +
+                                        speakerFacts +
+                                        agentFacts +
                                         monologue +
                                         model +
                                         replaceAll(replaceAll(exampleDialog, "$agent", agent), "$speaker", speaker) +
