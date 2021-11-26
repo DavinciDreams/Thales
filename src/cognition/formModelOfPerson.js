@@ -25,7 +25,7 @@ export async function formModelOfPerson(speaker, agent) {
     const currentConversation = fs.readFileSync(conversation).toString();
 
     const question = agent + ": " + getQuestion();
-    console.log("QUESTOIN IS:")
+    console.log("QUESTION IS:")
     console.log(question);
     const prompt = facts + currentConversation +  model + "\n" + replaceAll(question + "\n" + speaker + ": ", "$speaker", speaker);
     const data = {

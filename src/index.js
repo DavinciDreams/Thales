@@ -162,8 +162,6 @@ function startloop(speaker){
                                 // For speaker facts - Get last lines (2 * factsupdateinterval) - 1
                                 // For agent facts - Get last lines (2 * factsupdateinterval)
                                 // Add these facts summarizer
-                                console.log("******** conversationLines length is ", conversationLines.length);
-                                console.log("factsUpdateInterval * 2 - 1 is", factsUpdateInterval * 2 - 1);
                                 const speakerConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(Math.min(conversationLines.length, factsUpdateInterval * 2 - 1)).join("\n");
                                 const agentConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(Math.min(conversationLines.length, factsUpdateInterval * 2)).join("\n");
 
@@ -174,15 +172,6 @@ function startloop(speaker){
                                         fs.appendFileSync(conversationText, `${agent}: ${choice.text}\n`);
                                         console.log(`${agent}: ${choice.text}`)
                                         if (meta.messages % factsUpdateInterval == 0) {
-                                                // Log summaries to make sure we are doing right thing
-                                                console.log("************* summarizeAndStoreFactsAboutSpeaker")
-                                                console.log(speakerConversationLines);
-                                                console.log("************* end summarizeAndStoreFactsAboutSpeaker")
-
-                                                console.log("************* summarizeAndStoreFactsAboutAgent")
-                                                console.log(agentConversationLines)
-                                                console.log("************* end summarizeAndStoreFactsAboutAgent")
-
                                                 summarizeAndStoreFactsAboutSpeaker(speaker, agent, speakerConversationLines + conversation);
                                                 summarizeAndStoreFactsAboutAgent(speaker, agent, agentConversationLines + choice.text);
 

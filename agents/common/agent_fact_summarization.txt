@@ -1,2 +1,2 @@
-Summarize the facts about $agent from the conversation above:
-$agent
+$agent briefly summarized the facts about themselves based on their conversation:
+$agent: 

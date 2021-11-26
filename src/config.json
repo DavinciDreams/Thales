@@ -6,6 +6,6 @@
     "speakerFactsWindowSize": 10,
     "agentFactsWindowSize": 20,
     "modelWindowSize": 4,
-    "summarizationModel": "ada",
-    "conversationModel": "curie"
+    "summarizationModel": "davinci",
+    "conversationModel": "davinci"
 }
