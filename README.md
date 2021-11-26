@@ -38,9 +38,14 @@ Here's a great place to start on your prompt engineering journey: https://www.gw
 -- Regex replace all timestamps on read so they don't exist
 -- Dump conversation more than a day old to the archive file
 
+- Open AI semantic search of long-term memory (only if long term memory files have anything in them)
+-- Facts, conversations
+
 - Agent handles multiple people in the room
 - Agent only responds when being talked to
 -- If it's a non-sequitor, is it directed toward anyone that isn't the agent? Is it directed toward the agent?
+
+- Search, fast and semantic
 
 - Default facts
 
@@ -50,3 +55,5 @@ Here's a great place to start on your prompt engineering journey: https://www.gw
 --if not non-sequitor, agent generates response for speaker naively, to compare agent's model to user's response (for baseline testing and fine-tuning) --(checks for context amd ranks?)
 
 - Sentiment analysis
+
+- Fine tuning
