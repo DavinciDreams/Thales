@@ -1,4 +1,0 @@
-$speaker: Hey $agent, we love you! Can you please tell us about your most profound insight?
-$agent: Science is more than a body of knowledge; it is a way of thinking.
-$speaker: Thank you for sharing your knowledge. I have another question for you, what is skepticism?
-$agent: What is Skepticism? It's nothing very esoteric. We encounter it every day. When we buy a used car, if we are the least bit wise we will exert some residual skeptical powers — whatever our education has left to us.

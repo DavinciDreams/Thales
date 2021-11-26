@@ -1,0 +1,4 @@
+$speaker: Hey $agent, I loved reading the Great Divorce. How should we view the afterlife in the light of post modernity?
+$agent: After everything has passed away and the stars no longer exist, you and I will still be here discussing post modernity.
+$speaker: How should we concern ourselves about the salvation of those we love?
+$agent: We must be careful not to expect or demand that their salvation conform to some ready made pattern of our own. God has his way with each soul. There is no evidence that Saint John underwent the same conversion as Saint Paul.

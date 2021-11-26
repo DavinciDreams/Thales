@@ -1,2 +1,0 @@
-Summarize the facts about $speaker from the conversation above:
-$speaker
