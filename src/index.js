@@ -13,8 +13,10 @@ import { summarizeAndStoreFactsAboutAgent } from "./cognition/summarizeAndStoreF
 
 import { formModelOfPerson } from "./cognition/formModelOfPerson.js";
 
+import { urlencoded, json } from 'express';
+import  express  from 'express'
+
 import inquirer from 'inquirer';
-import { createWebServer } from "./utilities/webserver.js";
 var prompt = inquirer.createPromptModule();
 
 const namePrompt = [
@@ -31,13 +33,66 @@ const states = {
         THINKING: "THINKING"
 }
 
+let currentState = states.READY;
+
+if(process.env.TERMINAL){
+        // If speaker was provided, start the request loop
+        if(process.env.SPEAKER){
+                startloop(process.env.SPEAKER);
+        }
+        // If no speaker was provided, prompt the user
+        else {
+                prompt(namePrompt).then((text) => {
+                        // Check for OpenAI key, this will help people who clone it to get started
+                        if(!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes("XXXXX")){
+                                return console.error("Please create a .env file in root of this directory and add your OpenAI API key to it");
+                        }
+                        
+                        startloop(text.Name);
+                });
+        }
+}
+
+function startloop(speaker){
+                // Start prompt loop
+                setInterval(() => {
+                        // Are we thinking? return
+                        // Are we waiting for input? return
+                        if (currentState != states.READY) return;
+                        const questions = [
+                                {
+                                  type: 'input',
+                                  name: "Input",
+                                  message: `${speaker} >>>`
+                                }
+                        ];
+                        prompt(questions).then(async (text) => {
+                                handleMessage(text.Input, speaker);
+                        });
+                        currentState = states.WAITING;
+                }, 50);
+}
+
+async function createWebServer() {
+    const router = express.Router();
+    router.use(urlencoded({ extended: false }));
+    const app = express()
+    app.use(json())
+   
+    app.route('/msg').post((req, res) => {
+        const message = req.body.message
+        const sender = req.body.sender
+        console.log('request: ' + JSON.stringify(req.body))
+        handleMessage(message, sender, res)
+    });
+
+    app.listen(process.env.WEBSERVER_PORT, () => { console.log(`Server listening on http://localhost:${process.env.WEBSERVER_PORT}`); })
+}
+
 createWebServer()
 
-let currentState = states.READY;
 const senders = {}
-
-export function handleMessage(message, speaker, res) {
-        setTimeout(async () => {
+export async function handleMessage(message, speaker, res) {
                 if (senders[speaker] === undefined) senders[speaker] = states.READY;
                 while (senders[speaker] != states.READY) {console.log('state: ' + senders[speaker]);}
 
@@ -149,7 +204,7 @@ export function handleMessage(message, speaker, res) {
 
                 if (success) {
                         fs.appendFileSync(conversationText, `${agent}: ${choice.text}\n`);
-                        res.status(200).send(JSON.stringify({ result: choice.text }));
+                        if(res) res.status(200).send(JSON.stringify({ result: choice.text }));
                         if (meta.messages % factsUpdateInterval == 0) {
                                 summarizeAndStoreFactsAboutSpeaker(speaker, agent, speakerConversationLines + conversation);
                                 summarizeAndStoreFactsAboutAgent(speaker, agent, agentConversationLines + choice.text);
@@ -166,5 +221,4 @@ export function handleMessage(message, speaker, res) {
                 }
 
                 senders[speaker] = states.READY;
-        }, 10)
 }
