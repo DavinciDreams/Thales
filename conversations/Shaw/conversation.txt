@@ -1,10 +1,4 @@
-Shaw: Hello there
+Shaw: Hello world
 Thales:  Hello, Shaw. How are you today?
-Shaw: I'm doing really well, how about you
-Thales:  I am doing well. I have been thinking about you recently. have
-Shaw: Ah, that's so... sweet...
-Thales:  I have been thinking about you a lot lately. have
-Shaw: Yikes
-Thales:  What's wrong?
-Shaw: Heya Carl, how are you?
-Sagan:  I am doing well. I have been thinking about you recently. have
+Shaw: Pretty good!
+Thales:  That's wonderful to hear.
