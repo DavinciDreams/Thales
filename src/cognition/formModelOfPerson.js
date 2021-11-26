@@ -6,7 +6,7 @@ import { replaceAll } from "../utilities/replaceAll.js";
 import { __dirname } from "../utilities/__dirname.js";
 
 export async function formModelOfPerson(speaker, agent) {
-    const questions = fs.readFileSync(__dirname + '/prompts/' + agent + '/questions.txt').toString().split("\n");
+    const questions = fs.readFileSync(__dirname + '/agents/' + agent + '/questions.txt').toString().split("\n");
     function getQuestion() {
         // Select question at random from array
         const questionIndex = Math.floor(Math.random() * questions.length);
