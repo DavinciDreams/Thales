@@ -3,7 +3,6 @@ config();
 
 import fs from 'fs';
 import { checkThatFilesExist } from "./utilities/checkThatFilesExist.js";
-import { prompt, namePrompt, questions } from "./utilities/prompt.js";
 import getFilesForSpeaker from "./utilities/getFilesForSpeaker.js";
 import { makeGPTRequest } from "./utilities//makeGPTRequest.js";
 import { replaceAll } from "./utilities/replaceAll.js";
@@ -11,6 +10,17 @@ import { __dirname } from "./utilities/__dirname.js";
 
 import { summarizeAndStoreFacts } from "./cognition/summarizeAndStoreFacts.js";
 import { formModelOfPerson } from "./cognition/formModelOfPerson.js";
+
+import inquirer from 'inquirer';
+var prompt = inquirer.createPromptModule();
+
+const namePrompt = [
+        {
+          type: 'input',
+          name: "Name",
+          message: "What is your name?",
+        }
+];
 
 const states = {
         READY: "READY",
@@ -42,16 +52,23 @@ function startloop(speaker){
                         // Are we thinking? return
                         // Are we waiting for input? return
                         if (currentState != states.READY) return;
+                        const questions = [
+                                {
+                                  type: 'input',
+                                  name: "Input",
+                                  message: `${speaker} >>>`
+                                }
+                        ];
                         prompt(questions).then(async (text) => {
                                 const { updateInterval, defaultAgent, conversationWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
                                 const agent = process.env.AGENT ?? defaultAgent;
-                                const personality = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/personality.txt').toString(), "$agent", agent);
-                                const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent);
-                                const exampleDialog = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/dialog.txt').toString(), "$agent", agent), "$speaker", speaker);
-                                const monologue = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/monologue.txt').toString(), "$agent", agent);
-                                const room = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/room.txt').toString(), "$agent", agent);
-                                const actions = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/actions.txt').toString(), "$agent", agent);
-                                const factRecall = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/common/fact_recall.txt').toString(), "$agent", agent), "$speaker", speaker);
+                                const personality = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/personality.txt').toString(), "$agent", agent) + "\n";
+                                const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent) + "\n";
+                                const exampleDialog = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/dialog.txt').toString(), "$agent", agent), "$speaker", speaker) + "\n";
+                                const monologue = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/monologue.txt').toString(), "$agent", agent) + "\n";
+                                const room = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/room.txt').toString(), "$agent", agent) + "\n";
+                                const actions = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/actions.txt').toString(), "$agent", agent) + "\n";
+                                const factRecall = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/common/fact_recall.txt').toString(), "$agent", agent), "$speaker", speaker) + "\n";
         
                                 checkThatFilesExist(speaker);
                                 text = text.Input;
@@ -63,11 +80,11 @@ function startloop(speaker){
                                 meta.messages = meta.messages + 1;
         
                                 fs.appendFileSync(conversationText, userInput);
-                                const existingFacts = fs.readFileSync(speakerFactsFile).toString().trim();
+                                const existingFacts = fs.readFileSync(speakerFactsFile).toString().trim() + "\n";
                                 // If no facts, don't inject
                                 const facts = existingFacts == "" ? "" : factRecall + existingFacts + "\n";
         
-                                const conversation = fs.readFileSync(conversationText).toString();
+                                const conversation = fs.readFileSync(conversationText).toString() + "\n";
          
                                 const conversationLines = conversation.split('\n');
                                 if(conversationLines.length > conversationWindowSize){
