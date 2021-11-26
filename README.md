@@ -1,5 +1,5 @@
 # Thales
-Thales is a cognitive agent.
+Thales is an open source cognitive agent.
 
 ## Getting Started
 Clone the repo
@@ -23,6 +23,11 @@ Contributions welcome
 
 ### FOR PROGRAMMERS
 Please look below to TODOs, and contribute what you're interested in. If you have other ideas for features, please give them a try and submit as a PR. Together we can make something really incredible!
+
+### FOR NON PROGRAMMERS
+You can create your own agent entirely by modifying the text prompts, without needing more than to change a few lines of configuration. First, copy the folder in `agents` directory. Then add a command in the package.json -- you can copy one of the existing commands, and change the AGENT environment variable to the name of your personality. Modify the text files -- you can do this while the agent is running -- and explore the responses and history to tune your agent.
+
+Here's a great place to start on your prompt engineering journey: https://www.gwern.net/GPT-3
 
 ## TODO (In Progress)
 1. Dump all except last 10 exchanges of conversation
