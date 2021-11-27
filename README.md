@@ -1,5 +1,7 @@
 # Thales
-Thales is an open source cognitive agent.
+Thales is an autonomous agent. It's a free, open source cognitive framework to serve as the mind of your embodied agent.
+
+"Just works" out of the box with the XR Foundation Digital Being project, via websockets. Run Thales next to the Digital Being project for a full 3D embodied experience in XREngine or voice/video/text presence in Discord, Zoom, Google Meet, Telegram, SMS and Twitter: https://github.com/xrfoundation/digitalbeing
 
 ## Getting Started
 Clone the repo
