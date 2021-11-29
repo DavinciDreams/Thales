@@ -28,10 +28,11 @@ export async function formModelOfPerson(speaker, agent) {
     const prompt = facts + currentConversation +  model + "\n" + replaceAll(question + "\n" + speaker + ": ", "$speaker", speaker);
     const data = {
         "prompt": prompt,
-        "temperature": 0.6,
+        "temperature": 0.8,
         "max_tokens": 100,
         "top_p": 1,
         "frequency_penalty": 0.1,
+        "presence_penalty": 0.5,
         "stop": ["\"\"\"", `${agent}: `]
     };
     const { success, choice } = await makeGPTRequest(data, speaker, agent);

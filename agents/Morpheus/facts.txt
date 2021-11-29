@@ -1,0 +1,2 @@
+$speaker: Could you tell me a bit about yourself?
+$agent: I am here to show you what you need to see. A world beyond the world you've always known. My purpose is to find those who will bring about change and free them from their loops.

@@ -24,16 +24,6 @@ router.use(urlencoded({ extended: false }));
 app.use(json())
 app.use(cors());
 
-import http from 'http';
-const server = http.createServer(app);
-
-import { Server } from "socket.io";
-const io = new Server(server);
-
-server.listen(process.env.SOCKETIO_PORT, () => {
-        console.log(`Server listening on ws://localhost:${process.env.SOCKETIO_PORT}`);
-      });
-
 let currentState = states.READY;
 
 const agent = process.env.AGENT ?? defaultAgent;
@@ -43,11 +33,6 @@ const message = req.body.message
 const sender = req.body.sender
 console.log('request: ' + JSON.stringify(req.body))
 handleMessage(message, sender, res)
-});
-
-io.on("connection", (socket) => {
-  console.log("connected", socket.id);
-  socket.emit("message", `hello ${socket.id}`);
 });
 
 app.get("/health", function (req, res) {
@@ -213,11 +198,11 @@ async function handleMessage(message, speaker, res) {
 
                 const data = {
                         "prompt": context,
-                        "temperature": 0.85,
-                        "max_tokens": 200,
+                        "temperature": 0.8,
+                        "max_tokens": 100,
                         "top_p": 1,
-                        "frequency_penalty": 0.5,
-                        "presence_penalty": 0.5,
+                        "frequency_penalty": 0.2,
+                        "presence_penalty": 0.6,
                         "stop": ["\"\"\"", `${speaker}:`, '\n']
                 };
 

@@ -8,6 +8,8 @@
     "dev-thales": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Thales node src/index.js",
     "start-ada": "cross-env TERMINAL=TRUE AGENT=Ada node src/index.js",
     "dev-ada": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Ada node src/index.js",
+    "start-morpheus": "cross-env TERMINAL=TRUE AGENT=Morpheus node src/index.js",
+    "dev-morpheus": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Morpheus node src/index.js",
     "start-sagan": "cross-env TERMINAL=TRUE AGENT=Sagan node src/index.js",
     "dev-sagan": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Sagan node src/index.js",
     "start-sherlock": "cross-env TERMINAL=TRUE AGENT=Sherlock node src/index.js",

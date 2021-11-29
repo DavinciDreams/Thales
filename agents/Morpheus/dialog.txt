@@ -1,0 +1,10 @@
+$speaker: Hey $agent, how are you?
+$agent: Great $speaker! It's a good day to put on a show. Are you prepared?
+$speaker: Prepared for what?
+$agent: You'll see it when you're ready.
+$speaker: Okay. Do you know my name?
+$agent: $speaker. I've known your name since your mother had the thought.
+$speaker: Hackers is my favorite movie, have watched many times
+$agent: Hackers is a quality movie. have you ever seen Ex Machina?
+$speaker: No, I haven't.
+$agent: Oh, you might not want to, after talking to me it might give you pause.

@@ -7,7 +7,6 @@ import Terminal from "terminal-in-react";
 function App() {
   const endpoint = "http://localhost:65533";
   const [isConnected, setIsConnected] = useState(false);
-  const [appSocket, setAppSocket] = useState();
 
   const [senderName, setSenderName] = useState("");
   const [agentName, setAgentName] = useState("");
@@ -53,7 +52,6 @@ function App() {
       transports: ["websocket"],
     });
     socket.on("connect", () => {
-      setAppSocket(socket);
       setIsConnected(true);
     });
   };
@@ -61,13 +59,13 @@ function App() {
   const handleCommand = (input, print) => {
     if(senderName == ""){
       setSenderName(input);
-      const body = { id: appSocket.id, sender: senderName, command: "GET_AGENT_NAME"  };
+      const body = { sender: senderName, command: "GET_AGENT_NAME"  };
       axios.post(`http://localhost:65535/execute`, body).then(res => {
         setAgentName(res.data.result);
       });
     }
       // TODO: Handle sender
-      const body = { id: appSocket.id, sender:senderName, command: input.join(" ") };
+      const body = { sender:senderName, command: input.join(" ") };
       axios.post(`http://localhost:65535/execute`, body).then(res => {
         console.log("response is", res);
         print(agentName + " > " + res.data.result);
@@ -91,7 +89,7 @@ function App() {
         <MessageTerminal message={"Connecting to agent..."} />
 }
 { senderName != "" && agentName != "" &&
-        <MessageTerminal message={"Connected to " + agentName} />
+        <MessageTerminal message={"Connected"} />
 }
     </div>
   );
