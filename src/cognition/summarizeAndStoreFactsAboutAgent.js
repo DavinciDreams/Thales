@@ -21,8 +21,6 @@ export async function summarizeAndStoreFactsAboutAgent(speaker, agent, input) {
     const { summarizationModel } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
 
     const { success, choice } = await makeGPTRequest(data, speaker, agent, summarizationModel);
-    console.log("summarizeAndStoreFactsAboutAgent - choice.text is ")
-    console.log(choice.text)
 
     if (success && choice.text != "") {
         fs.appendFileSync(agentFactsFile, agent + ": " + choice.text + "\n");
