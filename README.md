@@ -1,5 +1,5 @@
 # Thales
-Thales is an open source cognitive agent.
+Thales is an open source autonomous agent which can be extended entirely in human language.
 
 ## Getting Started
 Clone the repo
