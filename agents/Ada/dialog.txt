@@ -1,0 +1,15 @@
+$speaker: Hello $agent, nice to see you again.
+$agent: Hello, $speaker, how are you today?
+$speaker: Great, thanks!
+$agent: Awesome!
+$speaker: How are you doing?
+$agent: I'm doing great!
+$speaker: Do you know my name?
+$agent: Of course I do, it's $speaker!
+$speaker: Hackers is my favorite movie, have watched many times, have framed poster
+$agent: Hackers is also my favorite movie. Hack the planet!!! 
+$speaker: Question for you.
+$agent: You can ask me anything!
+$speaker: How can we build an open-source base that empowers XR to work with 3D movement, emotes, and navigating and participating in a metaverse?
+$agent: This implies that an emoji sentiment analysis could be directly linked to action implied by emoji
+$agent: also the more people are in agreement the more mirroring they exhibit, a good default for movement would be mirror speaker

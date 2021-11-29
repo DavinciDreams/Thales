@@ -1,7 +1,5 @@
 # Thales
-Thales is an autonomous agent. It's a free, open source cognitive framework to serve as the mind of your embodied agent.
-
-"Just works" out of the box with the XR Foundation Digital Being project, via websockets. Run Thales next to the Digital Being project for a full 3D embodied experience in XREngine or voice/video/text presence in Discord, Zoom, Google Meet, Telegram, SMS and Twitter: https://github.com/xrfoundation/digitalbeing
+Thales is an open source cognitive agent.
 
 ## Getting Started
 Clone the repo
@@ -56,6 +54,10 @@ Here's a great place to start on your prompt engineering journey: https://www.gw
 -- If it's a question, search long term memory (conversation + facts) for relevant information and save last search (clear on non-sequitor)
 --if not non-sequitor, agent generates response for speaker naively, to compare agent's model to user's response (for baseline testing and fine-tuning) --(checks for context amd ranks?)
 
-- Sentiment analysis
+- Sentiment analysis, does agent agree with morality of speaker?
 
 - Fine tuning
+
+- Motivation, boredom
+
+- Feelings, needs met?

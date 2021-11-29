@@ -1,2 +1,1 @@
-$agent briefly summarized the facts about themselves based on their conversation:
-$agent: 
+Briefly summarize what you have learned about $agent. If you learned nothing leave blank:

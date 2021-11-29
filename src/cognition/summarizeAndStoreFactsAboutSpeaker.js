@@ -18,14 +18,14 @@ export async function summarizeAndStoreFactsAboutSpeaker(speaker, agent, input) 
         "temperature": 0.05,
         "max_tokens": 32,
         "top_p": 1,
-        "frequency_penalty": 0.0,
+        "frequency_penalty": 0.3,
         "stop": ["\"\"\"", "\n"]
     };
 
     let { success, choice } = await makeGPTRequest(data, speaker, agent, summarizationModel);
 
     if (success && choice.text != "") {
-        fs.appendFileSync(speakerFactsFile, "\n" + agent + ": " + choice.text + "\n");
+        fs.appendFileSync(speakerFactsFile, agent + ": " + choice.text + "\n");
     }
 }
 

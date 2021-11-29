@@ -1,2 +1,1 @@
-$agent briefly summarized the facts about $speaker based on their conversation:
-$agent: 
+$agent extracted the facts, if any, about $speaker based on their conversation:

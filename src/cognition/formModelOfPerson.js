@@ -36,6 +36,6 @@ export async function formModelOfPerson(speaker, agent) {
     };
     const { success, choice } = await makeGPTRequest(data, speaker, agent);
     if (success) {
-        fs.appendFileSync(speakerModelFile, "\n" + question + "\n" + speaker + ": " + choice.text + "\n");
+        fs.appendFileSync(speakerModelFile, question + "\n" + speaker + ": " + choice.text + "\n");
     }
 }

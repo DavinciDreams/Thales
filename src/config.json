@@ -1,6 +1,6 @@
 {
-    "defaultAgent": "Ada",
-    "factsUpdateInterval": 2,
+    "defaultAgent": "Thales",
+    "factsUpdateInterval": 4,
     "modelUpdateInterval": 4,
     "conversationWindowSize": 20,
     "activeConversationSize": 18,

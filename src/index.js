@@ -96,7 +96,7 @@ async function handleMessage(message, speaker, res) {
 
                 const { factsUpdateInterval, modelUpdateInterval, defaultAgent, conversationWindowSize, activeConversationSize, speakerFactsWindowSize, agentFactsWindowSize, modelWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
                 const agent = process.env.AGENT ?? defaultAgent;
-                console.log("*** ", agent, " IS ALIVE");
+
                 const morals = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/common/morals.txt').toString(), "$agent", agent), "$speaker", speaker);
                 const ethics = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/ethics.txt').toString(), "$agent", agent), "$speaker", speaker);
                 const personality = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/personality.txt').toString(), "$agent", agent);
@@ -127,74 +127,62 @@ async function handleMessage(message, speaker, res) {
                 meta.messages = meta.messages + 1;
 
                 fs.appendFileSync(conversationText, userInput);
-                console.log("userInput", userInput)
 
                 const conversation = replaceAll(fs.readFileSync(conversationText).toString(), '\n\n', '\n');
 
                 // Slice the conversation and store any more than the window size in the archive
                 const conversationLines = conversation.split('\n');
+                if(conversationLines.length > conversationWindowSize){
                         const oldConversationLines = conversationLines.slice(0, Math.max(0, conversationLines.length - conversationWindowSize));
-                        fs.appendFileSync(conversationArchive, "\n" +oldConversationLines.join("\n"));
                         const newConversationLines = conversationLines.slice(Math.min(conversationLines.length - conversationWindowSize));
+                        fs.appendFileSync(conversationArchive, "\n" +oldConversationLines.join("\n"));
                         fs.writeFileSync(conversationText, newConversationLines.join("\n"));   
-   
-
-                const existingSpeakerFacts = fs.readFileSync(speakerFactsFile).toString().trim();
-                const speakerFacts = existingSpeakerFacts == "" ? "" : existingSpeakerFacts + "\n"; // If no facts, don't inject
-                const speakerFactsLines = speakerFacts.split('\n');  // Slice the facts and store any more than the window size in the archive
-
-                if(speakerFactsLines.length > speakerFactsWindowSize){
-                        fs.appendFileSync(speakerFactsArchive, speakerFactsLines.slice(0, speakerFactsWindowSize).join("\n"));
-                        fs.writeFileSync(speakerFactsFile, speakerFactsLines.slice(speakerFactsWindowSize).join("\n"));      
                 }
-
+                const existingSpeakerFacts = replaceAll(fs.readFileSync(speakerFactsFile).toString().trim(), '\n\n', '\n');
+                const speakerFacts = existingSpeakerFacts == "" ? "" : existingSpeakerFacts; // If no facts, don't inject
+                const speakerFactsLines = speakerFacts.split('\n');  // Slice the facts and store any more than the window size in the archive
+                if(speakerFactsLines.length > speakerFactsWindowSize){
+                        fs.appendFileSync(speakerFactsArchive, speakerFactsLines.slice(0, speakerFactsLines.length - speakerFactsWindowSize).join("\n"));
+                        fs.writeFileSync(speakerFactsFile, speakerFactsLines.slice(speakerFactsLines.length - speakerFactsWindowSize).join("\n"));      
+                }
                 const existingAgentFacts = fs.readFileSync(agentFactsFile).toString().trim();
                 const agentFacts = existingAgentFacts == "" ? "" : existingAgentFacts + "\n"; // If no facts, don't inject
                 const agentFactsLines = agentFacts.split('\n'); // Slice the facts and store any more than the window size in the archive
-
                 if(agentFactsLines.length > agentFactsWindowSize){
-                        fs.appendFileSync(agentFactsArchive, agentFactsLines.slice(0, agentFactsWindowSize).join("\n"));
-                        fs.writeFileSync(agentFactsFile, agentFactsLines.slice(agentFactsWindowSize).join("\n"));      
+                        fs.appendFileSync(agentFactsArchive, agentFactsLines.slice(0, agentFactsLines.length - agentFactsWindowSize).join("\n"));
+                        fs.writeFileSync(agentFactsFile, agentFactsLines.slice(Math.max(0, agentFactsLines.length - agentFactsWindowSize)).join("\n"));      
                 }
 
                 // Slice the model and store any more than the window size in the archive
                 const model = fs.readFileSync(speakerModelFile).toString().trim() + "\n";
                 const modelLines = model.split('\n');
-                if(modelLines.length > modelWindowSize){
-                        const oldModelLines = modelLines.slice(0, -modelWindowSize);
-                        const newModelLines = modelLines.slice(modelWindowSize);
-                        fs.appendFileSync(speakerModelArchive, oldModelLines.join("\n"));
-                        fs.writeFileSync(speakerModelFile, newModelLines.join("\n"));      
-                }
+                const oldModelLines = modelLines.slice(0, Math.max(0, modelLines.length - modelWindowSize));
+                const newModelLines = modelLines.slice(Math.max(0, modelLines.length - modelWindowSize));
+                fs.appendFileSync(speakerModelArchive, oldModelLines.join("\n"));
+                fs.writeFileSync(speakerModelFile, newModelLines.join("\n"));      
 
-                console.log("personality");
-                console.log(personality);
-        
-        
                 let context =
                         // room +
                         // actions +
                         "The following is a description of " + agent + ":\n" +
-                        personality +
+                        personality + "\n" +
+                        `${agent} knows the following about themselves:\n${agent}` +
+                        agentFacts +
+                        `${agent} knows the following about ${speaker}:\n${speaker} ` +
+                        speakerFacts +
                         facts +
-                        // needsAndMotivations +
-                        // morals +
-                        // ethics +
-                        // "The following is a monologue by " + agent + ":\n" +
-                        // monologue +
-                        // `${agent} knows the following about themselves:\n`
-                        // agentFacts +
-                        // `${agent} knows the following about ${speaker}:\n`
-                        // speakerFacts +
-                        // `The following is a pretend dialog between ${agent} and ${speaker}, played out in ${agent}'s mind:\n`
-                        // model +
-                        // `The following is a an example conversation between ${agent} and ${speaker}:\n`
-                        // replaceAll(replaceAll(exampleDialog, "$agent", agent), "$speaker", speaker) +
+                        needsAndMotivations +
+                        morals +
+                        ethics +
+                        "The following is a monologue by " + agent + ":\n" +
+                        monologue +
+                        `The following is a pretend dialog between ${agent} and ${speaker}, played out in ${agent}'s mind:\n` +
+                        model +
+                        `The following is a an example conversation between ${agent} and ${speaker}:\n` +
+                        replaceAll(replaceAll(exampleDialog, "$agent", agent), "$speaker", speaker) +
                         `\nThe following is a real dialog between ${agent} and ${speaker}:\n` +
                         conversation + '\n' + `${agent}: `;
-                replaceAll(context, '\n\n', '\n')
-                console.log("context")
-                console.log(context)
+
                 if (process.env.DEBUG == "TRUE") {
                         console.log("*********************** CONTEXT");
                         console.log(context);
@@ -207,8 +195,8 @@ async function handleMessage(message, speaker, res) {
                         "temperature": 0.7,
                         "max_tokens": 200,
                         "top_p": 1,
-                        "frequency_penalty": 0.5,
-                        "stop": ["\"\"\"", `${speaker}:`]
+                        "frequency_penalty": 0.3,
+                        "stop": ["\"\"\"", `${speaker}:`, '\n']
                 };
 
                 const speakerConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(Math.min(conversationLines.length, factsUpdateInterval * 2 - 1)).join("\n");
@@ -217,7 +205,7 @@ async function handleMessage(message, speaker, res) {
                 const { success, choice } = await makeGPTRequest(data, speaker, agent);
 
                 if (success) {
-                        fs.appendFileSync(conversationText, `\n${agent}: ${choice.text}`);
+                        fs.appendFileSync(conversationText, `\n${agent}: ${choice.text}\n`);
                         if(res) res.status(200).send(JSON.stringify({ result: choice.text }));
                         console.log(agent + ">>> " + choice.text);
                         if (meta.messages % factsUpdateInterval == 0) {
