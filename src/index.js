@@ -162,8 +162,8 @@ async function handleMessage(message, speaker, res) {
                 fs.writeFileSync(speakerModelFile, newModelLines.join("\n"));      
 
                 let context =
-                        // room +
-                        // actions +
+                        room +
+                        actions +
                         "The following is a description of " + agent + ":\n" +
                         personality + "\n" +
                         `${agent} knows the following about themselves:\n${agent}` +
