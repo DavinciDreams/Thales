@@ -1,5 +1,5 @@
 # Thales
-Thales is an open source autonomous agent for anyone.
+Thales is an open source autonomous agent.
 
 ## Getting Started
 Clone the repo
