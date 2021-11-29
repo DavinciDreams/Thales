@@ -1,1 +1,1 @@
-Briefly summarize what you have learned about $agent. If you learned nothing leave blank:
+If $agent has stated any facts about themselves, print here. Otherwise leave blank.

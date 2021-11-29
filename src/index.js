@@ -13,38 +13,61 @@ import { summarizeAndStoreFactsAboutAgent } from "./cognition/summarizeAndStoreF
 
 import { formModelOfPerson } from "./cognition/formModelOfPerson.js";
 
-import { urlencoded, json } from 'express';
-import  express  from 'express'
+import { states, prompt, namePrompt } from "./prompt.js";
 
-import inquirer from 'inquirer';
-var prompt = inquirer.createPromptModule();
+import express, { urlencoded, json } from 'express';
+import cors from "cors";
 
-const namePrompt = [
-        {
-          type: 'input',
-          name: "Name",
-          message: "What is your name?",
-        }
-];
+const app = express();
+const router = express.Router();
+router.use(urlencoded({ extended: false }));
+app.use(json())
+app.use(cors());
 
-const states = {
-        READY: "READY",
-        WAITING: "WAITING",
-        THINKING: "THINKING"
-}
+import http from 'http';
+const server = http.createServer(app);
+
+import { Server } from "socket.io";
+const io = new Server(server);
+
+server.listen(process.env.SOCKETIO_PORT, () => {
+        console.log(`Server listening on ws://localhost:${process.env.SOCKETIO_PORT}`);
+      });
 
 let currentState = states.READY;
 
-const router = express.Router();
-router.use(urlencoded({ extended: false }));
-const app = express()
-app.use(json())
+const agent = process.env.AGENT ?? defaultAgent;
 
 app.route('/msg').post((req, res) => {
 const message = req.body.message
 const sender = req.body.sender
 console.log('request: ' + JSON.stringify(req.body))
 handleMessage(message, sender, res)
+});
+
+io.on("connection", (socket) => {
+  console.log("connected", socket.id);
+  socket.emit("message", `hello ${socket.id}`);
+});
+
+app.get("/health", function (req, res) {
+  res.send(`Server is alive and running! ${new Date()}`);
+});
+
+app.post("/execute", function (req, res) {
+        const message = req.body.command
+        if(message == "/reset"){
+                if(res) res.status(200).send(JSON.stringify({ result: agent + " has been reset" }));
+                fs.rmdirSync(getFilesForSpeakerAndAgent("", agent).conversationDirectory, { recursive: true });
+                return;
+        }
+        else if(message == "GET_AGENT_NAME"){
+                if(res) res.status(200).send(JSON.stringify({ result: agent }));
+                return;
+        }
+        console.log("Message is", message);
+        const sender = req.body.sender
+        handleMessage(message, sender, res)
 });
 
 app.listen(process.env.WEBSERVER_PORT, () => { console.log(`Server listening on http://localhost:${process.env.WEBSERVER_PORT}`); })
@@ -95,8 +118,6 @@ async function handleMessage(message, speaker, res) {
                 while (senders[speaker] != states.READY) {console.log('state: ' + senders[speaker]);}
 
                 const { factsUpdateInterval, modelUpdateInterval, defaultAgent, conversationWindowSize, activeConversationSize, speakerFactsWindowSize, agentFactsWindowSize, modelWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
-                const agent = process.env.AGENT ?? defaultAgent;
-
                 const morals = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/common/morals.txt').toString(), "$agent", agent), "$speaker", speaker);
                 const ethics = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/ethics.txt').toString(), "$agent", agent), "$speaker", speaker);
                 const personality = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/personality.txt').toString(), "$agent", agent);
@@ -192,10 +213,11 @@ async function handleMessage(message, speaker, res) {
 
                 const data = {
                         "prompt": context,
-                        "temperature": 0.7,
+                        "temperature": 0.85,
                         "max_tokens": 200,
                         "top_p": 1,
-                        "frequency_penalty": 0.3,
+                        "frequency_penalty": 0.5,
+                        "presence_penalty": 0.5,
                         "stop": ["\"\"\"", `${speaker}:`, '\n']
                 };
 
@@ -206,7 +228,7 @@ async function handleMessage(message, speaker, res) {
 
                 if (success) {
                         fs.appendFileSync(conversationText, `\n${agent}: ${choice.text}\n`);
-                        if(res) res.status(200).send(JSON.stringify({ result: choice.text }));
+                        respondWithMessage(res, choice.text);
                         console.log(agent + ">>> " + choice.text);
                         if (meta.messages % factsUpdateInterval == 0) {
                                 summarizeAndStoreFactsAboutSpeaker(speaker, agent, speakerConversationLines + conversation);
@@ -224,4 +246,8 @@ async function handleMessage(message, speaker, res) {
                 }
 
                 senders[speaker] = states.READY;
+}
+
+function respondWithMessage (res, text) {
+        if(res) res.status(200).send(JSON.stringify({ result: text }));
 }

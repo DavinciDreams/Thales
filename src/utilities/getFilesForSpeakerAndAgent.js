@@ -3,6 +3,7 @@ import { __dirname } from "./__dirname.js";
 
 export default function getFilesForSpeakerAndAgent(speaker, agent){
     return {
+        conversationDirectory: __dirname + "/conversations/" + agent,
         conversation: __dirname + "/conversations/" + agent + "/" + speaker + "/conversation.txt",
         conversationArchive: __dirname + "/conversations/" + agent + "/" + speaker + "/conversation_archive.txt",
         speakerModelFile: __dirname + "/conversations/" + agent + "/" + speaker + "/model.txt",

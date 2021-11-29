@@ -12,13 +12,15 @@ export async function summarizeAndStoreFactsAboutSpeaker(speaker, agent, input) 
     const { speakerFactsFile } = getFilesForSpeakerAndAgent(speaker, agent);
 
     // Take the input and send out a summary request
-    let prompt = replaceAll(replaceAll(input + speakerFactSummarizationPrompt, "$speaker", speaker), "$agent", agent);
+    let prompt = replaceAll(replaceAll(input + "\n" + speakerFactSummarizationPrompt, "$speaker", speaker), "$agent", agent);
     let data = {
         "prompt": prompt,
-        "temperature": 0.05,
+        "temperature": 0.3,
         "max_tokens": 32,
         "top_p": 1,
-        "frequency_penalty": 0.3,
+        "engine": "curie",
+        "frequency_penalty": 0.5,
+        "presence_penalty": 0.5,
         "stop": ["\"\"\"", "\n"]
     };
 

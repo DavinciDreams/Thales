@@ -12,10 +12,12 @@ export async function summarizeAndStoreFactsAboutAgent(speaker, agent, input) {
     const prompt = replaceAll(replaceAll(input + agentFactSummarizationPrompt, "$speaker", speaker), "$agent", agent);
     const data = {
         "prompt": prompt,
-        "temperature": 0.05,
+        "temperature": 0.3,
         "max_tokens": 32,
         "top_p": 1,
-        "frequency_penalty": 0.0,
+        "engine": "curie",
+        "frequency_penalty": 0.5,
+        "presence_penalty": 0.5,
         "stop": ["\"\"\"", "\n"]
     };
     const { summarizationModel } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
