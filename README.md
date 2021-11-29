@@ -1,5 +1,5 @@
 # Thales
-Thales is an open source autonomous agent which can be extended entirely in human language.
+Thales is an open source autonomous agent for anyone.
 
 ## Getting Started
 Clone the repo
