@@ -9,22 +9,23 @@ export async function summarizeAndStoreFactsAboutAgent(speaker, agent, input) {
     const { agentFactsFile } = getFilesForSpeakerAndAgent(speaker, agent);
 
     // Take the input and send out a summary request
-    const prompt = replaceAll(replaceAll(input + agentFactSummarizationPrompt, "$speaker", speaker), "$agent", agent);
+    const prompt = replaceAll(replaceAll(replaceAll(agentFactSummarizationPrompt.join('\n'), "$speaker", speaker), "$agent", agent), "$example", input);
+
     const data = {
         "prompt": prompt,
-        "temperature": 0.3,
-        "max_tokens": 32,
+        "temperature": 0.1,
+        "max_tokens": 20,
         "top_p": 1,
-        "engine": "curie",
         "frequency_penalty": 0.1,
-        "presence_penalty": 0.5,
-        "stop": ["\"\"\"", "\n"]
+        "presence_penalty": 0.0,
+        "stop": ["\"\"\"", "\n\n"]
     };
+
     const { summarizationModel } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
 
     const { success, choice } = await makeGPTRequest(data, speaker, agent, summarizationModel);
+    if (success && choice.text != "" && !choice.text.includes("no facts")) {
+        fs.appendFileSync(agentFactsFile, choice.text.replace("\n", "") + " ");
 
-    if (success && choice.text != "") {
-        fs.appendFileSync(agentFactsFile, agent + ": " + choice.text + "\n");
     }
 }

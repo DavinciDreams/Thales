@@ -1,1 +1,19 @@
-$agent extracted the facts, if any, about $speaker based on their conversation:
+$agent said What color are your eyes?
+$speaker: They are blue.
+Extract the facts about $speaker from the conversation (if there are any).
+$speaker's eyes are blue.
+
+$agent: Hey, how are you?
+$speaker: I'm great!
+Extract the facts about $speaker from the conversation (if there are any).
+<no facts>
+
+$agent: Hey, how are you?
+$speaker: I'm great! Do you know  my name?
+$agent: $speaker, of course! What is your favorite movie?
+$speaker: Hackers, from the 90s. Have you ever seen it?
+Extract the facts about $speaker from the conversation (if there are any).
+$speaker's favorite movie is Hackers. $speaker's name is $speaker.
+
+$example
+Extract the facts about $speaker from the conversation (if there are any).

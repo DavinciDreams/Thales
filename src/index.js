@@ -172,19 +172,19 @@ async function handleMessage(message, speaker, res) {
                         actions +
                         "The following is a description of " + agent + ":\n" +
                         personality + "\n" +
-                        `${agent} knows the following about themselves:\n${agent}` +
-                        agentFacts +
-                        `${agent} knows the following about ${speaker}:\n${speaker} ` +
-                        speakerFacts +
+                        `The follow facts about ${agent} are true:\n` +
                         facts +
+                        agentFacts +
                         needsAndMotivations +
                         morals +
                         ethics +
+                        `The follow facts about ${speaker} are true:\n` +
+                        speakerFacts +
                         "The following is a monologue by " + agent + ":\n" +
                         monologue +
-                        `The following is a pretend dialog between ${agent} and ${speaker}, played out in ${agent}'s mind:\n` +
-                        model +
-                        `The following is a an example conversation between ${agent} and ${speaker}:\n` +
+                        // `The following is a pretend dialog between ${agent} and ${speaker}, played out in ${agent}'s mind:\n` +
+                        // model +
+                        `The following is a an example dialog between ${agent} and ${speaker}:\n` +
                         replaceAll(replaceAll(exampleDialog, "$agent", agent), "$speaker", speaker) +
                         `\nThe following is a real dialog between ${agent} and ${speaker}:\n` +
                         conversation + '\n' + `${agent}: `;
@@ -198,16 +198,16 @@ async function handleMessage(message, speaker, res) {
 
                 const data = {
                         "prompt": context,
-                        "temperature": 0.8,
+                        "temperature": 0.85,
                         "max_tokens": 100,
                         "top_p": 1,
-                        "frequency_penalty": 0.2,
-                        "presence_penalty": 0.6,
+                        "frequency_penalty": 0.4,
+                        "presence_penalty": 0.4,
                         "stop": ["\"\"\"", `${speaker}:`, '\n']
                 };
 
-                const speakerConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(Math.min(conversationLines.length, factsUpdateInterval * 2 - 1)).join("\n");
-                const agentConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(Math.min(conversationLines.length, factsUpdateInterval * 2)).join("\n");
+                const speakerConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(conversationLines.length - (factsUpdateInterval * 2)).join("\n");
+                const agentConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(conversationLines.length - factsUpdateInterval * 2).join("\n");
 
                 const { success, choice } = await makeGPTRequest(data, speaker, agent);
 
@@ -216,12 +216,12 @@ async function handleMessage(message, speaker, res) {
                         respondWithMessage(res, choice.text);
                         console.log(agent + ">>> " + choice.text);
                         if (meta.messages % factsUpdateInterval == 0) {
-                                summarizeAndStoreFactsAboutSpeaker(speaker, agent, speakerConversationLines + conversation);
+                                summarizeAndStoreFactsAboutSpeaker(speaker, agent, speakerConversationLines);
                                 summarizeAndStoreFactsAboutAgent(speaker, agent, agentConversationLines + choice.text);
 
                         }
                         if (meta.messages % modelUpdateInterval == 0) {
-                                formModelOfPerson(speaker, agent);
+                                // formModelOfPerson(speaker, agent);
                         }
                         fs.writeFileSync(speakerMeta, JSON.stringify(meta));
 

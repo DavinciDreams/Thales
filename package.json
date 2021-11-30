@@ -3,7 +3,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node TERMINAL=TRUE src/index.js",
-    "dev": "cross-env TERMINAL=TRUE DEBUG=TRUE AGENT=Thales SPEAKER=Ada node src/index.js",
+    "dev": "cross-env TERMINAL=TRUE DEBUG=TRUE AGENT=Thales SPEAKER=Neo node src/index.js",
     "start-thales": "cross-env TERMINAL=TRUE AGENT=Thales node src/index.js",
     "dev-thales": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Thales node src/index.js",
     "start-ada": "cross-env TERMINAL=TRUE AGENT=Ada node src/index.js",

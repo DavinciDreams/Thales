@@ -1,1 +1,19 @@
-If $agent has stated any facts about themselves, print here. Otherwise leave blank.
+$speaker said "What color are your eyes?"
+$agent said, "They are blue."
+Extract the facts about $agent from the conversation (if there are any).
+$agent's eyes are blue.
+
+$speaker said, "Hey"
+$speaker said, "Hey there!"
+Extract the facts about $speaker from the conversation (if there are any).
+<no facts>
+
+$speaker said, "Hey, how are you?"
+$agent, "I'm great!"
+$speaker said, "What is your favorite movie?"
+$agent said, "Hackers, from the 90s. Have you ever seen it?"
+Extract the facts about $agent from the conversation (if there are any).
+$agent's favorite movie is Hackers.
+
+$example
+Extract the facts about $agent from the conversation (if there are any).

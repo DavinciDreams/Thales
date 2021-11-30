@@ -1,7 +1,6 @@
 import axios from 'axios';
 import fs from 'fs';
 import { __dirname } from "./__dirname.js";
-import { summarizeAndStoreFactsAboutAgent } from "../cognition/summarizeAndStoreFactsAboutAgent.js";
 
 export async function makeGPTRequest(data, speaker, agent, engine) {
         const API_KEY = process.env.OPENAI_API_KEY;

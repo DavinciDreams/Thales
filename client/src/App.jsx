@@ -89,7 +89,7 @@ function App() {
         <MessageTerminal message={"Connecting to agent..."} />
 }
 { senderName != "" && agentName != "" &&
-        <MessageTerminal message={"Connected"} />
+        <MessageTerminal message={"Connected to " + agentName} />
 }
     </div>
   );
