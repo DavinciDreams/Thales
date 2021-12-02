@@ -5,13 +5,10 @@ import fs from 'fs';
 import { checkThatFilesExist } from "./utilities/checkThatFilesExist.js";
 import getFilesForSpeakerAndAgent from "./utilities/getFilesForSpeakerAndAgent.js";
 import { makeGPTRequest } from "./utilities//makeGPTRequest.js";
-import { replaceAll } from "./utilities/replaceAll.js";
 import { __dirname } from "./utilities/__dirname.js";
 
 import { summarizeAndStoreFactsAboutSpeaker } from "./cognition/summarizeAndStoreFactsAboutSpeaker.js";
 import { summarizeAndStoreFactsAboutAgent } from "./cognition/summarizeAndStoreFactsAboutAgent.js";
-
-import { formModelOfPerson } from "./cognition/formModelOfPerson.js";
 
 import { states, prompt, namePrompt } from "./prompt.js";
 
@@ -29,10 +26,10 @@ let currentState = states.READY;
 const agent = process.env.AGENT ?? defaultAgent;
 
 app.route('/msg').post((req, res) => {
-const message = req.body.message
-const sender = req.body.sender
-console.log('request: ' + JSON.stringify(req.body))
-handleMessage(message, sender, res)
+        const message = req.body.message
+        const sender = req.body.sender
+        console.log('request: ' + JSON.stringify(req.body))
+        handleMessage(message, sender, res)
 });
 
 app.get("/health", function (req, res) {
@@ -102,16 +99,7 @@ async function handleMessage(message, speaker, res) {
                 if (senders[speaker] === undefined) senders[speaker] = states.READY;
                 while (senders[speaker] != states.READY) {console.log('state: ' + senders[speaker]);}
 
-                const { factsUpdateInterval, modelUpdateInterval, defaultAgent, conversationWindowSize, activeConversationSize, speakerFactsWindowSize, agentFactsWindowSize, modelWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
-                const morals = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/common/morals.txt').toString(), "$agent", agent), "$speaker", speaker);
-                const ethics = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/ethics.txt').toString(), "$agent", agent), "$speaker", speaker);
-                const personality = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/personality.txt').toString(), "$agent", agent);
-                const needsAndMotivations = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/needs_and_motivations.txt').toString(), "$agent", agent);
-                const exampleDialog = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/dialog.txt').toString(), "$agent", agent), "$speaker", speaker);
-                const monologue = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/monologue.txt').toString(), "$agent", agent);
-                const room = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/room.txt').toString(), "$agent", agent), "$speaker", speaker);
-                const facts = replaceAll(replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/facts.txt').toString(), "$agent", agent), "$speaker", speaker);
-                const actions = replaceAll(fs.readFileSync(__dirname + '/agents/' + agent + '/actions.txt').toString(), "$agent", agent);
+                const { dialogFrequencyPenality, dialogPresencePenality, factsUpdateInterval, conversationWindowSize, speakerFactsWindowSize, agentFactsWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
 
                 checkThatFilesExist(speaker, agent);
                 const text = message
@@ -122,8 +110,6 @@ async function handleMessage(message, speaker, res) {
                         conversationArchive,
                         speakerFactsFile,
                         speakerFactsArchive,
-                        speakerModelFile,
-                        speakerModelArchive,
                         agentFactsFile,
                         agentFactsArchive,
                         speakerMeta
@@ -134,7 +120,7 @@ async function handleMessage(message, speaker, res) {
 
                 fs.appendFileSync(conversationText, userInput);
 
-                const conversation = replaceAll(fs.readFileSync(conversationText).toString(), '\n\n', '\n');
+                const conversation = fs.readFileSync(conversationText).toString().replaceAll('\n\n', '\n');
 
                 // Slice the conversation and store any more than the window size in the archive
                 const conversationLines = conversation.split('\n');
@@ -144,7 +130,7 @@ async function handleMessage(message, speaker, res) {
                         fs.appendFileSync(conversationArchive, "\n" +oldConversationLines.join("\n"));
                         fs.writeFileSync(conversationText, newConversationLines.join("\n"));   
                 }
-                const existingSpeakerFacts = replaceAll(fs.readFileSync(speakerFactsFile).toString().trim(), '\n\n', '\n');
+                const existingSpeakerFacts = fs.readFileSync(speakerFactsFile).toString().trim().replaceAll( '\n\n', '\n');
                 const speakerFacts = existingSpeakerFacts == "" ? "" : existingSpeakerFacts; // If no facts, don't inject
                 const speakerFactsLines = speakerFacts.split('\n');  // Slice the facts and store any more than the window size in the archive
                 if(speakerFactsLines.length > speakerFactsWindowSize){
@@ -157,37 +143,26 @@ async function handleMessage(message, speaker, res) {
                 if(agentFactsLines.length > agentFactsWindowSize){
                         fs.appendFileSync(agentFactsArchive, agentFactsLines.slice(0, agentFactsLines.length - agentFactsWindowSize).join("\n"));
                         fs.writeFileSync(agentFactsFile, agentFactsLines.slice(Math.max(0, agentFactsLines.length - agentFactsWindowSize)).join("\n"));      
-                }
+                } 
 
-                // Slice the model and store any more than the window size in the archive
-                const model = fs.readFileSync(speakerModelFile).toString().trim() + "\n";
-                const modelLines = model.split('\n');
-                const oldModelLines = modelLines.slice(0, Math.max(0, modelLines.length - modelWindowSize));
-                const newModelLines = modelLines.slice(Math.max(0, modelLines.length - modelWindowSize));
-                fs.appendFileSync(speakerModelArchive, oldModelLines.join("\n"));
-                fs.writeFileSync(speakerModelFile, newModelLines.join("\n"));      
+                const rootAgent = __dirname + '/agents/' + agent + '/';
+                const rootCommon = __dirname + '/agents/common/';
 
-                let context =
-                        room +
-                        actions +
-                        "The following is a description of " + agent + ":\n" +
-                        personality + "\n" +
-                        `The follow facts about ${agent} are true:\n` +
-                        facts +
-                        agentFacts +
-                        needsAndMotivations +
-                        morals +
-                        ethics +
-                        `The follow facts about ${speaker} are true:\n` +
-                        speakerFacts +
-                        "The following is a monologue by " + agent + ":\n" +
-                        monologue +
-                        // `The following is a pretend dialog between ${agent} and ${speaker}, played out in ${agent}'s mind:\n` +
-                        // model +
-                        `The following is a an example dialog between ${agent} and ${speaker}:\n` +
-                        replaceAll(replaceAll(exampleDialog, "$agent", agent), "$speaker", speaker) +
-                        `\nThe following is a real dialog between ${agent} and ${speaker}:\n` +
-                        conversation + '\n' + `${agent}: `;
+                const context = fs.readFileSync(rootCommon + 'context.txt').toString()
+                .replaceAll("$morals", fs.readFileSync(rootCommon + 'morals.txt').toString())
+                .replaceAll("$ethics", fs.readFileSync(rootAgent + 'ethics.txt').toString())
+                .replaceAll("$personality", fs.readFileSync(rootAgent + 'personality.txt').toString())
+                .replaceAll("$needsAndMotivations", fs.readFileSync(rootAgent + 'needs_and_motivations.txt').toString())
+                .replaceAll("$exampleDialog", fs.readFileSync(rootAgent + 'dialog.txt').toString())
+                .replaceAll("$monologue", fs.readFileSync(rootAgent + 'monologue.txt').toString())
+                // .replaceAll("$room", fs.readFileSync(rootAgent + 'room.txt').toString())
+                .replaceAll("$facts", fs.readFileSync(rootAgent + 'facts.txt').toString())
+                // .replaceAll("$actions", fs.readFileSync(rootAgent + 'actions.txt').toString())
+                .replaceAll("$speakerFacts", speakerFacts)
+                .replaceAll("$agentFacts", agentFacts)
+                .replaceAll("$agent", agent)
+                .replaceAll("$speaker", speaker)
+                .replaceAll("$conversation", conversation);
 
                 if (process.env.DEBUG == "TRUE") {
                         console.log("*********************** CONTEXT");
@@ -198,12 +173,12 @@ async function handleMessage(message, speaker, res) {
 
                 const data = {
                         "prompt": context,
-                        "temperature": 0.85,
+                        "temperature": 0.9,
                         "max_tokens": 100,
                         "top_p": 1,
-                        "frequency_penalty": 0.4,
-                        "presence_penalty": 0.4,
-                        "stop": ["\"\"\"", `${speaker}:`, '\n']
+                        "frequency_penalty": dialogFrequencyPenality, 
+                        "presence_penalty": dialogPresencePenality,
+                        "stop": ["\"\"\"", `${speaker}:`]
                 };
 
                 const speakerConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(conversationLines.length - (factsUpdateInterval * 2)).join("\n");
@@ -212,16 +187,13 @@ async function handleMessage(message, speaker, res) {
                 const { success, choice } = await makeGPTRequest(data, speaker, agent);
 
                 if (success) {
-                        fs.appendFileSync(conversationText, `\n${agent}: ${choice.text}\n`);
+                        fs.appendFileSync(conversationText, `\n${agent}:${choice.text}\n`);
                         respondWithMessage(res, choice.text);
                         console.log(agent + ">>> " + choice.text);
                         if (meta.messages % factsUpdateInterval == 0) {
                                 summarizeAndStoreFactsAboutSpeaker(speaker, agent, speakerConversationLines);
                                 summarizeAndStoreFactsAboutAgent(speaker, agent, agentConversationLines + choice.text);
 
-                        }
-                        if (meta.messages % modelUpdateInterval == 0) {
-                                // formModelOfPerson(speaker, agent);
                         }
                         fs.writeFileSync(speakerMeta, JSON.stringify(meta));
 
