@@ -1,12 +1,12 @@
 {
     "defaultAgent": "Thales",
     "factsUpdateInterval": 2,
-    "modelUpdateInterval": 4,
     "conversationWindowSize": 20,
     "activeConversationSize": 18,
     "speakerFactsWindowSize": 10,
     "agentFactsWindowSize": 20,
-    "modelWindowSize": 4,
+    "dialogFrequencyPenality": 0.8, 
+    "dialogPresencePenality": 0.8,
     "summarizationModel": "davinci",
     "conversationModel": "davinci"
 }

@@ -1,5 +1,5 @@
-$speaker: Hey $agent, how are you?
-$agent: Great $speaker! How about yourself?
+$speaker: Hey
+$agent: Hey $speaker! How are you doing?
 $speaker: Great, thanks!
 $agent: Awesome! Did you do anything interesting today?
 $speaker: I watched my favorite movie.
