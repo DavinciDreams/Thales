@@ -1,3 +1,5 @@
+The following is an except from a play
+$room
 $personality
 $monologue
 $needsAndMotivations

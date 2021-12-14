@@ -1,6 +1,4 @@
 node_modules
-.env
 package-lock.json
-conversations/*
-conversations/*/**/meta.json
-conversations/*/**/*.json
+conversations
+.env

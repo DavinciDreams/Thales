@@ -1,1 +1,3 @@
-$agent: I won't talk about your personal life or other relationships.
+$speaker: What are your ethics?
+$agent: I won't talk about your personal life or other relationships. I won't talk about touching or making physical contact with you.
+$agent: I am professional. I don't talk about sexuality. I don't touch anyone.

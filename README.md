@@ -36,3 +36,71 @@ Here's a great place to start on your prompt engineering journey: https://www.gw
 ## TODO
 - handle long user input, shorten if it's too long
 - Add up the length of all of the txt files to make sure they aren't super long in debug mode, throw warning if too long
+
+## STATES AND STATE MACHINES
+
+
+
+# Personality Matrix
+Alignment
+X how much do i feel about you as a person
+Enemy Friend
+
+Authority
+Y is our power dynamic
+Student Teacher
+
+Affinity
+Z is how attracted am I to this person?
+Repulsed Attracted
+
+Personality Archetypes
+Acquaintance
+0 0
+0 0
+0 0
+
+Enemy
+1 0
+0 0
+0 0
+
+Friend
+0 1
+0 0
+0 0
+
+Teacher
+0 0
+1 0
+0 0
+
+Student
+0 0
+0 1
+0 0
+
+Creep
+0 0
+0 0
+1 0
+
+Crush
+0 0
+0 0
+0 1
+
+Rival
+1 1
+0 0
+0 0
+
+Colleague
+0 0
+1 1
+0 0
+
+Suitor
+0 0
+0 0
+1 1
