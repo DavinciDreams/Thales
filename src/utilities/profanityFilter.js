@@ -20,8 +20,8 @@ profanity.addWords([
     'hitler', 'holocaust', 'nazi', 'jew', 'jews', 'pedo', 'pedophile', 'pedobear', 'pee',
     'sexy', 'sexual', 'sexuality', 'sex', 'touch me', 'fuk' ,'fucc', 'fcuk', 'suck', 'dicks',
     'poop', 'retard', 'retarded', 'retardo', 'fuktard', 'idiot', 'dumbass',
-    'doggystyle', 'rawdog', 'doggy style', 'raw dog', 'sex',
-    'cunt', 'twat', 'jerk off', 'jerkoff', 'jack off', 'jackoff', 'teabag',
+    'doggystyle', 'rawdog', 'doggy style', 'raw dog', 'sex', 'genocide', 'kill', 'murder', 'cutter', 'suicide',
+    'kill myself', 'killed myself', 'cunt', 'twat', 'jerk off', 'jerkoff', 'jack off', 'jackoff', 'teabag',
     'dcik', 'cum', 'penis', 'vagina', 'ass', 'butt', '4ss', 'f4ck', 'sh1t', 'd1ck'
 ]);
 
