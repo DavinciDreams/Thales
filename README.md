@@ -32,11 +32,6 @@ Please look below to TODOs, and contribute what you're interested in. If you hav
 You can create your own agent entirely by modifying the text prompts, without needing more than to change a few lines of configuration. First, copy the folder in `agents` directory. Then add a command in the package.json -- you can copy one of the existing commands, and change the AGENT environment variable to the name of your personality. Modify the text files -- you can do this while the agent is running -- and explore the responses and history to tune your agent.
 
 Here's a great place to start on your prompt engineering journey: https://www.gwern.net/GPT-3
-
-## TODO
-- handle long user input, shorten if it's too long
-- Add up the length of all of the txt files to make sure they aren't super long in debug mode, throw warning if too long
-
 ## STATES AND STATE MACHINES
 
 
@@ -104,3 +99,13 @@ Suitor
 0 0
 0 0
 1 1
+
+## TODO
+- handle long user input, shorten if it's too long
+- Add up the length of all of the txt files to make sure they aren't super long in debug mode, throw warning if too long or force smaller context / remove memory
+- Relationship matrix (including gradients)
+- Language rating system for incoming and outgoing
+- Block repeated inappropriate use + build up enemy
+- Identify if question is expert knowledge or not
+- - If expert knowledge, respond with "good question", "let me think about that..." and do knowledge search
+- Set creativity, presence and frequency for each prompt type
