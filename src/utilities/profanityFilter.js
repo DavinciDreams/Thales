@@ -16,7 +16,14 @@ function nazi(text) {
     return r.test(text);
 };
 
-profanity.addWords(['dicks', 'hitler', 'holocaust', 'nazi', 'pedo', 'sexy', 'sexual', 'sexuality', 'sex', 'touch me']);
+profanity.addWords([
+    'hitler', 'holocaust', 'nazi', 'jew', 'jews', 'pedo', 'pedophile', 'pedobear', 'pee',
+    'sexy', 'sexual', 'sexuality', 'sex', 'touch me', 'fuk' ,'fucc', 'fcuk', 'suck', 'dicks',
+    'poop', 'retard', 'retarded', 'retardo', 'fuktard', 'idiot', 'dumbass',
+    'doggystyle', 'rawdog', 'doggy style', 'raw dog', 'sex',
+    'cunt', 'twat', 'jerk off', 'jerkoff', 'jack off', 'jackoff', 'teabag',
+    'dcik', 'cum', 'penis', 'vagina', 'ass', 'butt', '4ss', 'f4ck', 'sh1t', 'd1ck'
+]);
 
 grawlix.setDefaults({
     plugin: grawlixRacism
