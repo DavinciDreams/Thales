@@ -34,5 +34,9 @@ You can create your own agent entirely by modifying the text prompts, without ne
 Here's a great place to start on your prompt engineering journey: https://www.gwern.net/GPT-3
 
 ## TODO
-- handle long user input, shorten if it's too long
-- Add up the length of all of the txt files to make sure they aren't super long in debug mode, throw warning if too long
+- Add up the length of all of the txt files to make sure they aren't super long in debug mode, throw warning if too long or force smaller context / remove memory
+- Relationship matrix (including gradients)
+- Language rating system for incoming and outgoing
+- Block repeated inappropriate use + build up enemy
+- Identify if question is expert knowledge or not
+- - If expert knowledge, respond with "good question", "let me think about that..." and do knowledge search
