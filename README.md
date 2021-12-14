@@ -40,3 +40,4 @@ Here's a great place to start on your prompt engineering journey: https://www.gw
 - Block repeated inappropriate use + build up enemy
 - Identify if question is expert knowledge or not
 - - If expert knowledge, respond with "good question", "let me think about that..." and do knowledge search
+- Set creativity, presence and frequency for each prompt type
