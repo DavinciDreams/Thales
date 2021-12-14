@@ -16,6 +16,8 @@ export default function getFilesForSpeakerAndAgent(speaker, agent){
         personalityQuestions:  __dirname + "/agents/common/personality_questions.json",
         speakerProfaneResponsesFile: fs.existsSync(__dirname + "/agents/" + agent + "/speaker_profane_responses.txt") ?
             __dirname + "/agents/" + agent + "/speaker_profane_responses.txt" : __dirname + "/agents/common/speaker_profane_responses.txt",
+        sensitiveResponsesFile: fs.existsSync(__dirname + "/agents/" + agent + "/sensitive_responses.txt") ?
+        __dirname + "/agents/" + agent + "/sensitive_responses.txt" : __dirname + "/agents/common/sensitive_responses.txt",
         agentProfaneResponsesFile: fs.existsSync(__dirname + "/agents/" + agent + "/agent_profane_responses.txt") ?
             __dirname + "/agents/" + agent + "/agent_profane_responses.txt" : __dirname + "/agents/common/agent_profane_responses.txt",
         ratingFile: fs.existsSync(__dirname + "/agents/" + agent + "/rating.txt") ?

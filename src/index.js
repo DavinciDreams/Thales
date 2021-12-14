@@ -162,8 +162,8 @@ async function handleMessage(message, speaker, res) {
         currentState = states.THINKING;
 
         if (useProfanityFilter) {
-                const { isProfane, response } = checkIfSpeakerIsProfaneAndRespond(speaker, agent, message);
-                if (isProfane) {
+                const { isProfane, isSensitive, response } = checkIfSpeakerIsProfaneAndRespond(speaker, agent, message);
+                if (isProfane, isSensitive) {
                         console.log(agent + ">>> " + response);
 
                         if (res) res.status(200).send(JSON.stringify({ result: response }));
