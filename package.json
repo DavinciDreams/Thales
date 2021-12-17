@@ -26,6 +26,7 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "filter": "^0.1.1",
+    "fuzzball": "^2.1.2",
     "fuzzy-matching": "^0.4.3",
     "grawlix": "^1.0.6",
     "grawlix-racism": "^1.0.2",
@@ -41,6 +42,8 @@
     "uid-generator": "^2.0.0",
     "util": "^0.12.4",
     "vosk": "^0.3.30",
+    "weaviate-client": "^2.3.0",
+    "wikipedia": "^1.1.6",
     "wsrn": "^1.0.9"
   }
 }
