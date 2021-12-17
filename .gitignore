@@ -1,4 +1,10 @@
 node_modules
 package-lock.json
+<<<<<<< HEAD
 .env
 conversations
+=======
+conversations
+.env
+data
+>>>>>>> ca83163c34949f77394df5c451329edd62afbd3b
