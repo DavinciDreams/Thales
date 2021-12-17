@@ -1,15 +1,15 @@
 {
     "defaultAgent": "Thales",
     "useProfanityFilter": true,
-    "contentRating": "teen",
+    "contentRating": "mature",
     "filterSensitive": true,
     "factsUpdateInterval": 2,
     "conversationWindowSize": 20,
     "activeConversationSize": 18,
     "speakerFactsWindowSize": 10,
     "agentFactsWindowSize": 20,
-    "dialogFrequencyPenality": 0.8, 
-    "dialogPresencePenality": 0.8,
+    "dialogFrequencyPenality": 0.5, 
+    "dialogPresencePenality": 0.5,
     "summarizationModel": "davinci",
     "conversationModel": "davinci",
     "opinionModel": "davinci"

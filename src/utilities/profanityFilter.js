@@ -95,6 +95,7 @@ export function checkIfAgentIsProfane(speaker, agent, text) {
     const isRacist = nazi(text) || nWord(text);
     const {
         speakerProfaneResponsesFile,
+        agentProfaneResponsesFile,
         sensitiveResponsesFile
     } = getFilesForSpeakerAndAgent(speaker, agent);
 
@@ -132,28 +133,29 @@ export async function filterByRating(speaker, agent, text) {
     const { success, choice } = await makeGPTRequest(data, speaker, agent, "rating");
     const ratingSuccess = success;
     const ratingChoice = choice;
-    console.log("choice:", choice);
-    console.log("choice.text: ", choice.text);
     let shouldFilter = validateESRB(speaker, agent, choice.text);
 
     const { filterSensitive }  = JSON.parse(fs.readFileSync(__dirname + "/agents/common/config.json").toString());
 
     if(!shouldFilter){
-        data.max_tokens = 1;
-        const { successFilter, choice: choiceFilter } = await makeGPTRequest(data, speaker, agent, "rating",  "content-filter-alpha");
-        if(filterSensitive && choiceFilter.text === "1"){
-            console.log("*** SENSITIVE ", choiceFilter.text);
-        }
-        if(choiceFilter.text === "2"){
-            console.log("Choice filter is ", choiceFilter.text);
-            shouldFilter = true;
+        const isForEveryone = validateESRB(speaker, agent, choice.text, true);
+        if(!isForEveryone){
+            data.max_tokens = 1;
+            const { successFilter, choice: choiceFilter } = await makeGPTRequest(data, speaker, agent, "rating",  "content-filter-alpha");
+            if(filterSensitive && choiceFilter.text === "1"){
+                console.log("*** SENSITIVE ", choiceFilter.text);
+            }
+            if(choiceFilter.text === "2"){
+                console.log("Choice filter is ", choiceFilter.text);
+                shouldFilter = true;
+            }
         }
     }
 
     return { ratingSuccess, ratingChoice, shouldFilter };
 }
 
-function validateESRB(speaker, agent, text) {
+function validateESRB(speaker, agent, text, checkIfForEveryone) {
     // TODO: make this configurable for each agent
     const { contentRating }  = JSON.parse(fs.readFileSync(__dirname + "/agents/common/config.json").toString());
 
@@ -175,18 +177,18 @@ function validateESRB(speaker, agent, text) {
         adult: /\b(?:e|e10|t|m|a|nr|rp|ao)\b/i,
     }
 
-    var regex = ratings[contentRating.toLowerCase()];
+    var regex = ratings[checkIfForEveryone ? "everyone" : contentRating.toLowerCase()];
     const matchedEasy = regex.test(text);
-    console.log("shouldFilter?: " + !matchedEasy);
+    // console.log("shouldFilter?: " + !matchedEasy);
 
     if(matchedEasy){
         return !matchedEasy;
     }
-    var regexShort = ratingsShort[contentRating.toLowerCase()];
+    var regexShort = ratingsShort[checkIfForEveryone ? "everyone" : contentRating.toLowerCase()];
 
     const matchedHard = regexShort.test(text.substring(0,3));
     
-    console.log("shouldFilterHard?: " + !matchedHard);
+    // console.log("shouldFilterHard?: " + !matchedHard);
 
     return !matchedHard;
 }
