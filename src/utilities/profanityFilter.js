@@ -56,7 +56,8 @@ function getWordCount(text){
 
 async function testIfIsToxic(text, threshold){
     if (HF_API_TOKEN) {
-        const result = await makeHFRequest(text, "jpcorb20/toxic-detector-distilroberta");
+        const result = await makeHFRequest(text, "unitary/toxic-bert");
+        console.log(result);
         result[0].forEach((sentence) => {
             if (sentence.score > threshold) {
                 return true;
@@ -85,12 +86,15 @@ export async function  evaluateTextAndRespondIfToxic(speaker, agent, text, evalu
 
     // The user said the n word or started talking about nazis
     if(isBlatantlyOffensive){
+        console.log("is offensive");
+        console.log(text);
         const response = profaneResponses[Math.floor(Math.random() * profaneResponses.length)];
         return { isProfane: true, response };
     }
 
     // The user said something profane
     if(isProfane){
+        console.log("is profane: ", text);
         const response = profaneResponses[Math.floor(Math.random() * profaneResponses.length)];
         return { isProfane: true, response };
     }
@@ -130,7 +134,7 @@ export async function  evaluateTextAndRespondIfToxic(speaker, agent, text, evalu
     //     return { isProfane: true, response };
     // }
     
-    return { isProfane: false };
+    return { isProfane: false, response: null };
 }
 
 async function filterWithOpenAI(speaker, agent, text) {

@@ -5,7 +5,7 @@ export default function readRelationshipMatrix(speaker, agent){
     // Check if we have an opinion yet
     // If not, form one and save the file
     // Read personality
-    const relationshipMatrixLines = fs.readFileSync(__dirname + `/agents/${agent}/personality_matrix.txt`).toString().split("\n");
+    const relationshipMatrixLines = fs.readFileSync(__dirname + `/agents/${agent}/relationship_matrix.txt`).toString().split("\n");
 
     // Making a 3x2 array
     const relationshipMatrix = [];

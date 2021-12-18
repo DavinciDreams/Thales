@@ -1,1 +1,0 @@
-$agent can perform the following actions: dance, wave, smile, frown, stand, laugh

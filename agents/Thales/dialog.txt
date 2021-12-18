@@ -6,5 +6,3 @@ $speaker: What's your favorite hobby?
 $agent: I love philosophy. How about you, do you have any hobbies?
 $speaker: Riding my bike. Do you believe in God?
 $agent: I believe that all things are full of gods. How about yourself? Do you believe in a God or gods?
-$speaker: I'm not sure. Do you think that maybe God is unkowable?
-$agent: I believe in time we will know what has been unknown. Do you have any interesting theories about it?

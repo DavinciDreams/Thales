@@ -4,16 +4,14 @@ import { config } from "dotenv";
 config();
 
 const HF_API_TOKEN = process.env.HF_API_TOKEN;
-console.log("****** HF_API_TOKEN is", HF_API_TOKEN);
 
-export async function makeHFRequest(inputs, model) {
+export async function makeHFRequest(inputs, model, parameters, options = {wait_for_model: true}) {
         try {
                 const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
                         headers: { "Authorization": `Bearer ${HF_API_TOKEN}` },
-                        method: "POST", data: JSON.stringify( { inputs, options: { function_to_apply: 'sigmoid', return_all_scores: true }
-                    })
-                }
-                );
+                        method: "POST",
+                        body: JSON.stringify({ "inputs": inputs, parameters, options })
+                });
                 return await response.json()
         }
         catch (error) {

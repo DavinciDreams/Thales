@@ -12,7 +12,7 @@ export default function getFilesForSpeakerAndAgent(speaker, agent){
         agentFactsFile: __dirname + "/conversations/" + agent + "/agent_facts.txt",
         speakerModelArchive: __dirname + "/conversations/" + agent + "/" + speaker + "/model_archive.txt",
         speakerMetaFile: __dirname + "/conversations/" + agent + "/" + speaker + "/meta.json",
-        relationshipMatrix: __dirname + "/agents/" + agent + "/personality_matrix.txt",
+        relationshipMatrix: __dirname + "/agents/" + agent + "/relationship_matrix.txt",
         personalityQuestions:  __dirname + "/agents/common/personality_questions.json",
         speakerProfaneResponsesFile: fs.existsSync(__dirname + "/agents/" + agent + "/speaker_profane_responses.txt") ?
             __dirname + "/agents/" + agent + "/speaker_profane_responses.txt" : __dirname + "/agents/common/speaker_profane_responses.txt",

@@ -13,8 +13,6 @@ function respondWithMessage(agent, text, res) {
         console.log(agent + ">>> " + text);
 }
 
-const senders = {}
-
 
 function evaluateTerminalCommands(message) {
         if (message === "/reset") { // If the user types /reset into the console...
@@ -168,12 +166,12 @@ export async function handleInput(message, speaker, agent, res) {
                 speakerMetaFile
         } = getFilesForSpeakerAndAgent(speaker, agent);
 
+        // Append the speaker's message to the conversation
+        fs.appendFileSync(conversationFile, userInput);
+
         // Parse files into objects
         const meta = JSON.parse(fs.readFileSync(speakerMetaFile).toString());
         const conversation = fs.readFileSync(conversationFile).toString().replaceAll('\n\n', '\n');
-
-        // Append the speaker's message to the conversation
-        fs.appendFileSync(conversationFile, userInput);
 
         // Increment the agent's conversation count for this speaker
         meta.messages = meta.messages + 1;
@@ -188,11 +186,11 @@ export async function handleInput(message, speaker, agent, res) {
         // searchWikipedia(text.Input) .then( (out) => { console.log("**** WEAVIATE: " + JSON.stringify(out)); currentState = states.READY; });
 
         // Print the context to the console if running indev mode
-        if (process.env.DEBUG == "TRUE") {
-                console.log("*********************** CONTEXT");
-                console.log(context);
-                console.log("***********************");
-        };
+        // if (process.env.DEBUG == "TRUE") {
+        //         console.log("*********************** CONTEXT");
+        //         console.log(context);
+        //         console.log("***********************");
+        // };
 
         // Create a data object to pass to the transformer API
         const data = {
@@ -213,18 +211,26 @@ export async function handleInput(message, speaker, agent, res) {
                 const error = "Sorry, I had an error";
                 fs.appendFileSync(conversationFile, `\n${agent}: ${error}\n`);
                 return respondWithMessage(agent, error, res);
-        }
+        };
 
         // Check agent isn't about to say something offensive
-        const { isProfane, response } = await evaluateTextAndRespondIfToxic(speaker, agent, choice.text);
+        const { isProfane, response } = await evaluateTextAndRespondIfToxic(speaker, agent, choice.text, true);
 
         if (isProfane) {
-                fs.appenIdFileSync(conversationFile, `\n${agent}: ${response}\n`);
-                return respondWithMessage(agent, choice.text, res);
+                fs.appendFileSync(conversationFile, `\n${agent}: ${response}\n`);
+                return respondWithMessage(agent, response, res);
         }
 
         if (meta.messages % factsUpdateInterval == 0) {
                 formOpinionAboutSpeaker(speaker, agent);
+
+                const { conversationFile } = getFilesForSpeakerAndAgent(speaker, agent);
+                const conversation = fs.readFileSync(conversationFile).toString().trim();
+                const conversationLines = conversation.split('\n');
+
+                const speakerConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(conversationLines.length - (factsUpdateInterval * 2)).join("\n");
+                const agentConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(conversationLines.length - factsUpdateInterval * 2).join("\n");
+
                 summarizeAndStoreFactsAboutSpeaker(speaker, agent, speakerConversationLines);
                 summarizeAndStoreFactsAboutAgent(speaker, agent, agentConversationLines + choice.text);
 
