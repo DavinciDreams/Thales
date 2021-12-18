@@ -8,9 +8,26 @@ const client = weaviate.client({
   host: "semantic-search-wikipedia-with-weaviate.api.vectors.network:8080/",
 });
 
-// searchWikipedia(text.Input) .then( (out) => { console.log("**** WEAVIATE: " + JSON.stringify(out)); currentState = states.READY; });
-
 export const searchWikipedia = async (keyword) => {
+
+  // if keywords contains more than three words, summarize with GPT-3
+  if (keyword.trim().split(" ").length > 3) {
+    const data = {
+      "prompt": keyword + "\n\nKeywords:",
+      "temperature": 0.3,
+      "max_tokens": 60,
+      "top_p": 1,
+      "frequency_penalty": 0.8,
+      "presence_penalty": 0,
+      "stop": ['\n']
+    };
+
+    const { success, choice } = await makeGPTRequest(data, speaker, agent, "conversation");
+    if (success) {
+      keyword = choice.text;
+    }
+  }
+
   // Search for it, and accept suggestion if there is one
   const searchResults = await wiki.search(keyword);
 

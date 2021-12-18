@@ -1,3 +1,0 @@
-Alignment=0
-Authority=1
-Attraction=0

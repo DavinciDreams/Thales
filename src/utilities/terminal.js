@@ -1,4 +1,4 @@
-import { processInput } from "../processInput.js";
+import { handleInput } from "../handleInput.js";
 import { states, prompt, namePrompt } from "./prompt.js";
 
 let currentState = states.READY;
@@ -18,7 +18,7 @@ export function initTerminal(agent) {
                                 }
                         ];
                         prompt(questions).then(async (text) => {
-                                await processInput(text.Input, speaker, agent);
+                                await handleInput(text.Input, speaker, agent);
                                 currentState = states.READY;
                         });
                         currentState = states.WAITING;

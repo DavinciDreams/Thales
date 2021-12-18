@@ -1,17 +1,15 @@
 import fs from "fs";
-import { makeGPTRequest } from "../utilities/makeGPTRequest.js";
 import getFilesForSpeakerAndAgent from "../utilities/getFilesForSpeakerAndAgent.js";
-import { __dirname } from "../utilities/__dirname.js";
-import readPersonalityMatrix from "../utilities/readPersonalityMatrix.js";
+import readRelationshipMatrix from "../utilities/readRelationshipMatrix.js";
 
 export async function formOpinionAboutSpeaker(speaker, agent, input) {
-    const metaFile = getFilesForSpeakerAndAgent(speaker, agent).speakerMeta;
+    const metaFile = getFilesForSpeakerAndAgent(speaker, agent).speakerMetaFile;
     const meta = JSON.parse(fs.readFileSync(metaFile).toString());
 
     // check if metafile has personality meta in it
-    if(!meta.personalityMatrix){
+    if(!meta.relationshipMatrix){
         // If it doesn't, read initialization from agent and store in meta
-        meta.personalityMatrix = readPersonalityMatrix(speaker, agent);
+        meta.relationshipMatrix = readRelationshipMatrix(speaker, agent);
     }
 
     // Ask some questions about the conversation
