@@ -11,7 +11,7 @@ router.use(urlencoded({ extended: false }));
 app.use(json())
 app.use(cors());
 
-const agent = process.env.AGENT ?? defaultAgent;
+const agent = process.env.AGENT?.replace('_', ' ');
 
 app.get("/health", async function (req, res) {
         res.send(`Server is alive and running! ${new Date()}`);
@@ -37,9 +37,9 @@ app.listen(process.env.WEBSERVER_PORT, () => { console.log(`Server listening on 
 }
 
 if(process.env.BATTLEBOTS){
-        const speaker = process.env.SPEAKER;
-        const agent = process.env.AGENT;
-        const message = "Hello, " + agent + "\n";
+        const speaker = process.env.SPEAKER?.replace('_', ' ');
+        const agent = process.env.AGENT?.replace('_', ' ');
+        const message = "Hello, " + agent;
         console.log(speaker + " >>> " + message);
         let ignoreContentFilter = true;
         // Make a function that self-invokes with the opposites
@@ -48,7 +48,7 @@ if(process.env.BATTLEBOTS){
 
 
 async function runBattleBot(speaker, agent, message, ignoreContentFilter) {
+        console.log(speaker, agent, message, ignoreContentFilter)
         const m = await handleInput(message, speaker, agent, null, ignoreContentFilter);
-        ignoreContentFilter = !ignoreContentFilter;
         setTimeout(() => runBattleBot(agent, speaker, m, ignoreContentFilter), 10000);
 }

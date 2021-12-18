@@ -8,9 +8,11 @@ import { checkThatFilesExist } from "./utilities/checkThatFilesExist.js";
 import getFilesForSpeakerAndAgent from "./utilities/getFilesForSpeakerAndAgent.js";
 import { evaluateTextAndRespondIfToxic } from "./utilities/profanityFilter.js";
 import { __dirname } from "./utilities/__dirname.js";
+
 function respondWithMessage(agent, text, res) {
         if (res) res.status(200).send(JSON.stringify({ result: text }));
         console.log(agent + ">>> " + text);
+        return text;
 }
 
 
@@ -137,6 +139,9 @@ function generateContext(speaker, agent, conversation) {
 }
 
 export async function handleInput(message, speaker, agent, res) {
+        console.log("Handling input: " + message);
+        console.log("speaker: " + speaker + " | " + "agent: " + agent);
+
         if (evaluateTerminalCommands(message)) return;
         checkThatFilesExist(speaker, agent);
 
@@ -149,11 +154,11 @@ export async function handleInput(message, speaker, agent, res) {
         // If the profanity filter is enabled in the agent's config...
         if (useProfanityFilter) {
                 // Evaluate if the speaker's message is toxic
-                const { isProfane, isSensitive, response } = await evaluateTextAndRespondIfToxic(speaker, agent, message);
+                const { isProfane, isSensitive, response } = await evaluateTextAndRespondIfToxic(speaker, agent, message);      
                 if ((isProfane || isSensitive) && response) {
                         console.log(agent + ">>> " + response);
                         if (res) res.status(200).send(JSON.stringify({ result: response }));
-                        return;
+                        return response;
                 }
         }
 
@@ -183,6 +188,7 @@ export async function handleInput(message, speaker, agent, res) {
         const context = generateContext(speaker, agent, conversation);
 
         // TODO: Wikipedia?
+
         // searchWikipedia(text.Input) .then( (out) => { console.log("**** WEAVIATE: " + JSON.stringify(out)); currentState = states.READY; });
 
         // Print the context to the console if running indev mode

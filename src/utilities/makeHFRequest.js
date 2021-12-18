@@ -10,7 +10,7 @@ export async function makeHFRequest(inputs, model, parameters = {}, options = {u
                 const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
                         headers: { "Authorization": `Bearer ${HF_API_TOKEN}` },
                         method: "POST",
-                        body: JSON.stringify({ inputs })
+                        body: JSON.stringify({ inputs, parameters, options })
                 });
                 return await response.json()
         }

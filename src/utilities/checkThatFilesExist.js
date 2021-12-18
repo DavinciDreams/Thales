@@ -14,12 +14,15 @@ function makeDirectory(dir){
     }
 }
 
-export function checkThatFilesExist(speaker, agent){
+export function makeDirectories(speaker, agent){
     makeDirectory(__dirname + "/conversations");
     makeDirectory(__dirname + "/conversations/" + agent);
     makeDirectory(__dirname + "/conversations/" + agent + "/" + speaker);
     makeDirectory(__dirname + "/conversations/" + agent + "/" + speaker + "/history");
+}
 
+export function checkThatFilesExist(speaker, agent){
+    makeDirectories(speaker, agent);
     const { conversationFile, speakerModelFile, speakerFactsFile, agentFactsFile, agentFactsArchiveFile, conversationArchiveFile, speakerModelArchive, speakerFactsArchiveFile, speakerMetaFile }
         = getFilesForSpeakerAndAgent(speaker, agent);
     // If the file doesn't exist, write it

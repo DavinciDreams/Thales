@@ -1,0 +1,6 @@
+0 0 # Alignment - Enemy - Friend
+0 0 # Authority - Student teacher
+0 0 # Affinity - Repulsed intrigued
+1 1 # Limit Alignment - Enemy - Friend
+1 1 # Limit Authority - Student teacher
+1 1 # Limit Affinity - Repulsed intrigued

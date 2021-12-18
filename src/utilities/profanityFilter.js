@@ -76,7 +76,7 @@ export async function evaluateTextAndRespondIfToxic(speaker, agent, textIn, eval
         speakerProfaneResponsesFile,
         sensitiveResponsesFile
     } = getFilesForSpeakerAndAgent(speaker, agent);
-    const text = textIn.replace('\'', '');
+    const text = textIn?.trim().replace('\'', '');
     const profaneResponses = fs.readFileSync(speakerProfaneResponsesFile).toString().replaceAll('\n\n', '\n').replace('\'', '').split('\n');
     const sensitiveResponses = fs.readFileSync(sensitiveResponsesFile).toString().replaceAll('\n\n', '\n').replace('\'', '').split('\n');
 
