@@ -2,7 +2,7 @@
     "defaultAgent": "Thales",
     "useProfanityFilter": true,
     "contentRating": "mature",
-    "filterSensitive": false,
+    "filterSensitive": true,
     "factsUpdateInterval": 2,
     "conversationWindowSize": 20,
     "activeConversationSize": 18,
