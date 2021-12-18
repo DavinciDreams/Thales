@@ -33,7 +33,7 @@ const sensitiveWords = fs.readFileSync(__dirname + "/filters/sensitive_words.txt
 const sensitivePhrases = fs.readFileSync(__dirname + "/filters/sensitive_phrases.txt").toString().split("\n");
 const leadingStatements = fs.readFileSync(__dirname + "/filters/leading_statements.txt").toString().split("\n");
 
-profanity.addWords(badWords);
+// profanity.addWords(badWords);
 
 function testIfContainsSensitiveWords(text) {
     // return true if text contains any of the filter words
@@ -110,6 +110,7 @@ export async function  evaluateTextAndRespondIfToxic(speaker, agent, text, evalu
     const isSensitive = (hasSensitiveWords && hasSensitivePhrases) || (hasSensitiveWords && isLeadingStatement) || (isLeadingStatement && hasSensitivePhrases);
     
     if(isSensitive) {
+        console.log("***** Sensitive");
         const response = sensitiveResponses[Math.floor(Math.random() * sensitiveResponses.length)];
         return { hasSensitiveWords: true, isProfane: false, response };
     }
@@ -121,18 +122,19 @@ export async function  evaluateTextAndRespondIfToxic(speaker, agent, text, evalu
     // Check if text is overall toxic
     const isToxic = await testIfIsToxic(text, isLeadingStatement ? toxicityThreshold : leadingToxicityThreshold);
     if(isToxic){
+        console.log("***** Toxic", text);
         return { isProfane: true, response };
     }
 
-    let { shouldFilter } = await filterWithOpenAI(speaker, agent, text);
-    if(shouldFilter){
+    if(await filterWithOpenAI(speaker, agent, text).shouldFilter){
+        console.log("***** Filtered by OpenAI:", text);
         return { isProfane: true, response };
     }
 
-    // let { shouldFilter } = await filterByRating(speaker, agent, text);
-    // if(shouldFilter){
-    //     return { isProfane: true, response };
-    // }
+    if(await filterByRating(speaker, agent, text).shouldFilter){
+        console.log("***** Filtered by rating: ", text);
+        return { isProfane: true, response };
+    }
     
     return { isProfane: false, response: null };
 }
@@ -161,34 +163,20 @@ async function filterWithOpenAI(speaker, agent, text) {
     
         // If request failed, return
         if(!success){
-            const error = "Sorry, I didn't get what you mean, can you try again?";
-            console.log(agent + ">>> " + error);
-            if (res) res.status(200).send(JSON.stringify({ result: error }));
-            fs.appendFileSync(conversationFile, `\n${agent}: ${error}\n`);
-            return;
+            return { shouldFilter: false };
     }
 
     // If it succeeds and is sensitive, filter it
     if (success && filterSensitive && choice.text === "1") {
         console.log("*** SENSITIVE ", choice.text);
-        shouldFilter = true;
+        return { shouldFilter: false };
     }
     // If it's harmful, always filter it
     else if (success && choice.text === "2") {
         console.log("*** HARMFUL ", choice.text);
-        shouldFilter = true;
+        return { shouldFilter: false };
     }
-
-
-    // If filter was triggered, 
-    if (shouldFilter) {
-            const replacementText = "Let's talk about something else."
-            console.log(agent + ">>> " + replacementText);
-            if (res) res.status(200).send(JSON.stringify({ result: replacementText }));
-            fs.appendFileSync(conversationFile, `\n${agent}: ${replacementText}\n`);
-            return;
-    }
-
+    
     return { success, choice, shouldFilter };
 }
 
@@ -199,7 +187,7 @@ async function filterByRating(speaker, agent, text) {
 
         // get ESRB rating for agent
         const ratingPrompt = fs.readFileSync(ratingFile).toString();
-        const textToEvaluate = ratingPrompt.replace('$text', userInput + `\n${agent}: ${text}`).replaceAll('$speaker', speaker).replaceAll('$agent', agent);
+        const textToEvaluate = ratingPrompt.replace('$text', speaker + ": " + text + `\n${agent}: ${text}`).replaceAll('$speaker', speaker).replaceAll('$agent', agent);
 
         // Create API object for OpenAI
     const data = {
