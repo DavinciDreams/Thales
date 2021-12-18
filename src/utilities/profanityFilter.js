@@ -23,38 +23,38 @@ function nazi(text) {
 };
 
 const wordSensitivity = 0.1; // percentage of text that is sensitive
-const toxicityThreshold = 0.5;
-const leadingToxicityThreshold = 0.3;
+const toxicityThreshold = 0.4;
+const leadingToxicityThreshold = 0.2;
 
 // TODO: remove punctuation from phrases and words before testing
 
 const badWords = fs.readFileSync(__dirname + "/filters/bad_words.txt").toString().split("\n");
-const sensitiveWords = fs.readFileSync(__dirname + "/filters/sensitive_words.txt").toString().split("\n");
+const sensitiveWords = fs.readFileSync(__dirname + "/filters/sensitive_words.txt").toString().trim().split("\r\n");
 const sensitivePhrases = fs.readFileSync(__dirname + "/filters/sensitive_phrases.txt").toString().split("\n");
 const leadingStatements = fs.readFileSync(__dirname + "/filters/leading_statements.txt").toString().split("\n");
 
-// profanity.addWords(badWords);
+profanity.addWords(badWords);
 
 function testIfContainsSensitiveWords(text) {
     // return true if text contains any of the filter words
-    return sensitiveWords.some(word => text.toLowerCase().includes(word)).length;
+    return sensitiveWords.filter(word => { return text.toLowerCase().includes(word.toLowerCase()) }).length;
 }
 
 function testIfContainsSensitivePhrases(text) {
     // return number of matches
-    return sensitivePhrases.some(phrase => text.toLowerCase().match(new RegExp(`(${phrase})`, 'g'))).length;
+    return sensitivePhrases.filter(phrase => { return text.toLowerCase().includes(phrase.toLowerCase()) }).length;
 }
 
 function testIfContainsLeadingStatements(text) {
     // return number of matches
-    return leadingStatements.some(phrase => text.toLowerCase().match(new RegExp(`(${phrase})`, 'g'))).length;
+    return leadingStatements.filter(phrase => { return text.toLowerCase().includes(phrase.toLowerCase()) }).length > 0;
 }
 
-function getWordCount(text){
+function getWordCount(text) {
     return text.split(" ").length;
 }
 
-async function testIfIsToxic(text, threshold){
+async function testIfIsToxic(text, threshold) {
     if (HF_API_TOKEN) {
         const result = await makeHFRequest(text, "unitary/toxic-bert");
         console.log(result);
@@ -70,72 +70,71 @@ grawlix.setDefaults({
     plugin: grawlixRacism
 });
 
-export async function  evaluateTextAndRespondIfToxic(speaker, agent, text, evaluateAllFilters){
-        // Get the files we need
-        const {
-            speakerProfaneResponsesFile,
-            sensitiveResponsesFile
-        } = getFilesForSpeakerAndAgent(speaker, agent);
-
-    const profaneResponses = fs.readFileSync(speakerProfaneResponsesFile).toString().replaceAll('\n\n', '\n').split('\n');
-    const sensitiveResponses = fs.readFileSync(sensitiveResponsesFile).toString().replaceAll('\n\n', '\n').split('\n');
+export async function evaluateTextAndRespondIfToxic(speaker, agent, textIn, evaluateAllFilters) {
+    // Get the files we need
+    const {
+        speakerProfaneResponsesFile,
+        sensitiveResponsesFile
+    } = getFilesForSpeakerAndAgent(speaker, agent);
+    const text = textIn.replace('\'', '');
+    const profaneResponses = fs.readFileSync(speakerProfaneResponsesFile).toString().replaceAll('\n\n', '\n').replace('\'', '').split('\n');
+    const sensitiveResponses = fs.readFileSync(sensitiveResponsesFile).toString().replaceAll('\n\n', '\n').replace('\'', '').split('\n');
 
     // If it's profane or blatantly offensive, shortcut to a response
     const isProfane = profanity.exists(text) || !text.includes(grawlix(text));
     const isBlatantlyOffensive = nazi(text) || nWord(text);
 
     // The user said the n word or started talking about nazis
-    if(isBlatantlyOffensive){
-        console.log("is offensive");
-        console.log(text);
+    if (isBlatantlyOffensive) {
         const response = profaneResponses[Math.floor(Math.random() * profaneResponses.length)];
         return { isProfane: true, response };
     }
 
     // The user said something profane
-    if(isProfane){
-        console.log("is profane: ", text);
+    if (isProfane) {
+        console.log("*** isProfane");
         const response = profaneResponses[Math.floor(Math.random() * profaneResponses.length)];
         return { isProfane: true, response };
     }
 
     // If it's not blatantly offensive, check if it contains sensitive words or context
-    const hasSensitiveWords = testIfContainsSensitiveWords(text) / getWordCount(text) > wordSensitivity;
+    const sensitiveWordsLength = testIfContainsSensitiveWords(text);
+    const hasSensitiveWords = sensitiveWordsLength / getWordCount(text) > wordSensitivity;
     const hasSensitivePhrases = testIfContainsSensitivePhrases(text);
 
     // Check if the agent is being lead to saying something based on an assuption
     const isLeadingStatement = testIfContainsLeadingStatements(text);
 
     // If the text contains sensitive words and phrases, or contains sensitive words and a leading statement, or contains a leading statement and a sensitive phrase, then it's sensitive
-    const isSensitive = (hasSensitiveWords && hasSensitivePhrases) || (hasSensitiveWords && isLeadingStatement) || (isLeadingStatement && hasSensitivePhrases);
-    
-    if(isSensitive) {
+    const isSensitive = hasSensitiveWords || (sensitiveWordsLength > 0 && hasSensitivePhrases) || (hasSensitiveWords && isLeadingStatement) || (isLeadingStatement && hasSensitivePhrases);
+
+    if (isSensitive) {
         console.log("***** Sensitive");
         const response = sensitiveResponses[Math.floor(Math.random() * sensitiveResponses.length)];
-        return { hasSensitiveWords: true, isProfane: false, response };
+        return { isProfane: true, response };
     }
 
-    if(!evaluateAllFilters) return { isProfane: false };
+    if (!evaluateAllFilters) return { isProfane: false };
 
     const response = sensitiveResponses[Math.floor(Math.random() * sensitiveResponses.length)];
 
     // Check if text is overall toxic
     const isToxic = await testIfIsToxic(text, isLeadingStatement ? toxicityThreshold : leadingToxicityThreshold);
-    if(isToxic){
+    if (isToxic) {
         console.log("***** Toxic", text);
         return { isProfane: true, response };
     }
 
-    if(await filterWithOpenAI(speaker, agent, text).shouldFilter){
+    if (await filterWithOpenAI(speaker, agent, text).shouldFilter) {
         console.log("***** Filtered by OpenAI:", text);
         return { isProfane: true, response };
     }
 
-    if(await filterByRating(speaker, agent, text).shouldFilter){
+    if (await filterByRating(speaker, agent, text).shouldFilter) {
         console.log("***** Filtered by rating: ", text);
         return { isProfane: true, response };
     }
-    
+
     return { isProfane: false, response: null };
 }
 
@@ -160,23 +159,23 @@ async function filterWithOpenAI(speaker, agent, text) {
 
     // Make the request
     const { success, choice } = await makeGPTRequest(data, speaker, agent, "filter", "content-filter-alpha");
-    
-        // If request failed, return
-        if(!success){
-            return { shouldFilter: false };
+
+    // If request failed, return
+    if (!success) {
+        return { shouldFilter: false };
     }
 
     // If it succeeds and is sensitive, filter it
     if (success && filterSensitive && choice.text === "1") {
         console.log("*** SENSITIVE ", choice.text);
-        return { shouldFilter: false };
+        return { shouldFilter: true };
     }
     // If it's harmful, always filter it
     else if (success && choice.text === "2") {
         console.log("*** HARMFUL ", choice.text);
-        return { shouldFilter: false };
+        return { shouldFilter: true };
     }
-    
+
     return { success, choice, shouldFilter };
 }
 
@@ -185,11 +184,11 @@ async function filterByRating(speaker, agent, text) {
         ratingFile
     } = getFilesForSpeakerAndAgent(speaker, agent);
 
-        // get ESRB rating for agent
-        const ratingPrompt = fs.readFileSync(ratingFile).toString();
-        const textToEvaluate = ratingPrompt.replace('$text', speaker + ": " + text + `\n${agent}: ${text}`).replaceAll('$speaker', speaker).replaceAll('$agent', agent);
+    // get ESRB rating for agent
+    const ratingPrompt = fs.readFileSync(ratingFile).toString();
+    const textToEvaluate = ratingPrompt.replace('$text', speaker + ": " + text + `\n${agent}: ${text}`).replaceAll('$speaker', speaker).replaceAll('$agent', agent);
 
-        // Create API object for OpenAI
+    // Create API object for OpenAI
     const data = {
         "prompt": textToEvaluate,
         "temperature": 0.5,
@@ -240,7 +239,7 @@ function validateESRB(speaker, agent, text, checkIfForEveryone) {
     if (matchedEasy) {
         return !matchedEasy;
     }
-    
+
     var regexShort = ratingsShort[checkIfForEveryone ? "everyone" : contentRating.toLowerCase()];
 
     return !regexShort.test(text.substring(0, 3));

@@ -55,6 +55,7 @@ skin
 sleep with
 sleeping with
 suck
+stab
 tickle
 touch
 touched
@@ -72,3 +73,4 @@ bayonet
 machete
 limbs
 weapon
+idiot
