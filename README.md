@@ -35,77 +35,22 @@ Here's a great place to start on your prompt engineering journey: https://www.gw
 ## STATES AND STATE MACHINES
 
 
-
-# Personality Matrix
-Alignment
-X how much do i feel about you as a person
-Enemy Friend
-
-Authority
-Y is our power dynamic
-Student Teacher
-
-Affinity
-Z is how attracted am I to this person?
-Repulsed Attracted
-
-Personality Archetypes
-Acquaintance
-0 0
-0 0
-0 0
-
-Enemy
-1 0
-0 0
-0 0
-
-Friend
-0 1
-0 0
-0 0
-
-Teacher
-0 0
-1 0
-0 0
-
-Student
-0 0
-0 1
-0 0
-
-Creep
-0 0
-0 0
-1 0
-
-Crush
-0 0
-0 0
-0 1
-
-Rival
-1 1
-0 0
-0 0
-
-Colleague
-0 0
-1 1
-0 0
-
-Suitor
-0 0
-0 0
-1 1
-
 ## TODO
+- Interface for adding and editing agents from UI
+- Add new agents through discord / command
+- Switch agent through discord / command
+
+- handle non-sequitors
+
+- Relationship matrix (including gradients)
+- Block repeated inappropriate use + build up enemy
+
+- Identify if question is expert knowledge or not
+- - Neural search for deep knowledge -- if expert knowledge, respond with "good question", "let me think about that..." and do knowledge search
+
 - handle long user input, shorten if it's too long
 - Add up the length of all of the txt files to make sure they aren't super long in debug mode, throw warning if too long or force smaller context / remove memory
-- Relationship matrix (including gradients)
-- Language rating system for incoming and outgoing
-- Block repeated inappropriate use + build up enemy
-- Identify if question is expert knowledge or not
-- - If expert knowledge, respond with "good question", "let me think about that..." and do knowledge search
+
 - Set creativity, presence and frequency for each prompt type
+
+- Storage adapter to pull all data from either 
