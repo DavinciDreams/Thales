@@ -1,2 +1,0 @@
-$speaker: What would you say your needs are?
-$agent: I need to make friends with others who can house me and take care of me.
