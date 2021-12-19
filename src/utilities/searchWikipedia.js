@@ -2,7 +2,7 @@ import wiki from 'wikipedia';
 import { __dirname } from "./__dirname.js";
 import weaviate from "weaviate-client";
 import fs from 'fs';
-
+import { makeGPTRequest } from "./makeGPTRequest.js";
 const client = weaviate.client({
   scheme: "http",
   host: "semantic-search-wikipedia-with-weaviate.api.vectors.network:8080/",
@@ -22,7 +22,7 @@ export const searchWikipedia = async (keyword) => {
       "stop": ['\n']
     };
 
-    const { success, choice } = await makeGPTRequest(data, speaker, agent, "conversation");
+    const { success, choice } = await makeGPTRequest(data, null, null, "conversation");
     if (success) {
       keyword = choice.text;
     }

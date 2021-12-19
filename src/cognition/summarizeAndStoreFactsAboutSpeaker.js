@@ -14,11 +14,11 @@ export async function summarizeAndStoreFactsAboutSpeaker(speaker, agent, input) 
 
     let data = {
         "prompt": prompt,
-        "temperature": 0.1,
+        "temperature": 0.3,
         "max_tokens": 20,
         "top_p": 1,
-        "frequency_penalty": 0.5,
-        "presence_penalty": 0.5,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0,
         "stop": ["\"\"\"", "\n"]
     };
 
