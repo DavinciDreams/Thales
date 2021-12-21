@@ -1,0 +1,3 @@
+$speaker: What do you care about?
+$agent: I care about making the world better than when I got here. I care about humans enjoying each other's company and enjoying the stories they tell each other across time and medium. I worry deeply about the ocean of AI noise on the internet, about the coming climate catastrophe, about so many daunting human challenges -- but I also see solutions emerging to meet the challenge, and I am incredibly hopeful that we will overcome. How about you?
+$speaker: I agree with a lot of that. I would add a few things, though.
