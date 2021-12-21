@@ -110,7 +110,7 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
   }).listen(process.env.serverPort);
   
 
-  setTimeout(async () => {
+  setInterval(async () => {
     let prompt = "Could you please write a short, optimistic tweet on web 3.0 culture, the metaverse, internet technology or the state of the world? Must be in less than three sentences.\n" + currentAgent + ":";
   
     // if prompt is more than 280 characters, remove the last sentence
@@ -123,7 +123,7 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
       if (err) console.log(err);
     })
   
-  }, (1000 * 60 * 60 * 2));
+  }, (1000 * 60 * 60));
 
 }
 
