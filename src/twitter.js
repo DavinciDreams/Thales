@@ -1,43 +1,9 @@
 const { Autohook } = require('twitter-autohook');
 const http = require('http');
 const url = require('url');
-import { handleInput } from "./handleInput";
+import { handleInput } from "./utilities/handleInput";
 
 const currentAgent = process.env.AGENT ?? "Shawbot";
-
-const {
-  twitterConsumerKey,
-  twitterConsumerSecret,
-  twitterAccessToken,
-  twitterAccessTokenSecret,
-  twitterId,
-  twitterWebhookPort,
-  ngrokToken,
-  serverPort
-} = {
-  twitterConsumerSecret: process.env.twitterConsumerSecret,
-  twitterConsumerSecret: process.env.twitterConsumerSecret,
-  twitterAccessToken: process.env.twitterAccessToken,
-  twitterAccessTokenSecret: process.env.twitterAccessTokenSecret,
-  twitterId: process.env.twitterId,
-  twitterWebhookPort: process.env.twitterWebhookPort,
-  ngrokToken: process.env.ngrokToken,
-  serverPort: process.env.serverPort
-}
-
-const twitterConfigInvalid =
-  twitterConsumerKey === undefined ||
-  twitterConsumerSecret === undefined ||
-  twitterAccessToken === undefined ||
-  twitterAccessTokenSecret === undefined ||
-  twitterId === undefined ||
-  twitterWebhookPort === undefined ||
-  twitterConsumerKey === null ||
-  twitterConsumerSecret === null ||
-  twitterAccessToken === null ||
-  twitterAccessTokenSecret === null ||
-  twitterId === null ||
-  twitterWebhookPort === null
 
 let TwitClient;
 
@@ -74,8 +40,6 @@ const validateWebhook = (token, auth) => {
 }
 
 export const createTwitterClient = async (twitterId = process.env.twitterId) => {
-  if (twitterConfigInvalid)
-    return console.warn("*** No bot config found for Twitter client, skipping initialization")
   TwitClient = new require('twit')({
     consumer_key: process.env.twitterConsumerKey,
     consumer_secret:process.env. twitterConsumerSecret,
