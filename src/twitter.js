@@ -32,12 +32,19 @@ const SendMessage = (id, twitterUserId, messageType, text) => {
   }
 }
 
-const PostMessage = (id, text) => {
-
-}
-
 const HandleResponse = async (id, name, receivedMessage, messageType, event) => {
-  const reply = await handleInput(receivedMessage, name, currentAgent, null, false);
+  let reply = await handleInput(receivedMessage, name, currentAgent, null, false);
+
+  // if prompt is more than 280 characters, remove the last sentence
+  while (reply.length > 280) {
+    reply = reply.substring(0, reply.lastIndexOf(".")) + ".";
+  }
+
+  TwitClient.post('statuses/update', { status: reply }, function (err, data, response) {
+    if (err) console.log(err);
+  })
+
+
   SendMessage(id, name, messageType, reply);
 }
 
@@ -114,12 +121,12 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
   setInterval(async () => {
     let prompt = "Could you please write a short, optimistic tweet on web 3.0 culture, the metaverse, internet technology or the state of the world? Must be in less than three sentences.\n" + currentAgent + ":";
   
-    // if prompt is more than 280 characters, remove the last sentence
-    while (prompt.length > 280) {
-      prompt = prompt.substring(0, prompt.lastIndexOf(".")) + ".";
-    }
-  
-    const reply = await handleInput(prompt, "Friend", currentAgent, null, false);
+    let reply = await handleInput(prompt, "Friend", currentAgent, null, false);
+
+        // if prompt is more than 280 characters, remove the last sentence
+        while (reply.length > 280) {
+          reply = reply.substring(0, reply.lastIndexOf(".")) + ".";
+        }
     TwitClient.post('statuses/update', { status: reply }, function (err, data, response) {
       if (err) console.log(err);
     })
