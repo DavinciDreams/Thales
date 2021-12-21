@@ -73,7 +73,8 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
       const ReceivedMessage = event.tweet_create_events[0].text;
       const message = ReceivedMessage.replace("@" + twitterId + " ", "")
       if(!screenName.toLowerCase().includes(twitterId.toLowerCase())){
-        HandleResponse(id, screenName, message, 'Tweet', event)
+        HandleResponse(id, screenName, message, 'Tweet', event);
+      }
     }
 
     if (typeof (event.direct_message_events) !== 'undefined') {
