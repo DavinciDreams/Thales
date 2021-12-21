@@ -2,89 +2,26 @@ import { config } from "dotenv";
 config();
 import cors from "cors";
 import express, { json, urlencoded } from 'express';
-import fs from "fs";
 import { handleInput } from "./handleInput.js";
 import { initTerminal } from "./utilities/terminal.js";
-import { createAgent } from "./utilities/createAgent.js";
 
 import Discord, { Intents } from 'discord.js';
 
-export const client = new Discord.Client({ partials: ['MESSAGE', 'USER', 'REACTION'], intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES] })//{ intents: [ Intents.GUILDS, Intents.GUILD_MEMBERS, Intents.GUILD_VOICE_STATES, Intents.GUILD_PRESENCES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES] });
+export const client = new Discord.Client({partials: ['MESSAGE', 'USER', 'REACTION'], intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]})//{ intents: [ Intents.GUILDS, Intents.GUILD_MEMBERS, Intents.GUILD_VOICE_STATES, Intents.GUILD_PRESENCES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES] });
 
 client.once("ready", () => {
-        console.log("ChatBot online!");
+  console.log("ChatBot online!");
 });
 
-let defaultAgent = "Thales";
-
-
-
-let currentAgents = {
-        guilds: []
-}
-
-// a function that synchronously reads currentAgents from a json file in the __dirname folder if it exists
-function readAgents() {
-        try {
-                let data = require("./discordAgents.json");
-                currentAgents = data;
-        } catch (e) {
-                console.log("No discordAgents.json file found, creating one");
-                currentAgents = {
-                        guilds: []
-                }
-                writeAgents();
-        }
-}
-
-readAgents();
-
-
-// a function that writes currentAgents to a json file in the __dirname folder
-function writeAgents() {
-        let json = JSON.stringify(currentAgents);
-        fs.writeFileSync("./discordAgents.json", json, (err) => {
-                if (err) {
-                        console.log(err);
-                }
-        });
-}
+let currentAgent = "Thales";
 
 client.on("message", async message => {
-        console.log(message)
-        // If guild ID is null, default
-        if (!currentAgents[message.guildId]) {
-                currentAgents[message.guildId] = {
-                        [message.channelId]: defaultAgent
-                }
-                // Otherwise, if channel ID is null, default it
-        } else if (!currentAgents[message.guildId][message.channelId]) {
-                currentAgents[message.guildId][message.channelId] = defaultAgent
-        }
+//   if (message.author.bot) return;
 
-        let content = message.content;
-        // if discord message author is this user, ignore
-        if (message.author.id === client.user.id) return;
-
-        if (!content) return;
-
-        if (message.content.includes("/become")) {
-                // make a constant that isthe value of message.content without the first word and space
-                // capitalize the first letter of each word in the agent name
-                let agentName = message.content.substring(message.content.split(" ")[0].length + 1)
-                        .split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
-                console.log("agentName: ", agentName);
-                currentAgents[message.guildId][message.channelId] = agentName;
-                const out = await createAgent(message.author, currentAgents[message.guildId][message.channelId], "", "");
-                currentAgents[message.guildId][message.channelId] = agentName; // out.displayTitle ?? out.title ?? agentName;
-                await message.channel.send("I am now " + currentAgents[message.guildId][message.channelId]);
-                return;
-        }
-
-
-        const reply = await handleInput(message.content, message.author, currentAgents[message.guildId][message.channelId], null, false);
-        await message.channel.send(reply);
-        writeAgents();
+  let content = message.content;
+  if(!content) return;
+  const reply = await handleInput(message.content, message.author, currentAgent, null, false);
+  await message.channel.send(reply);
 });
 
 client.login(process.env.DISCORD_API_TOKEN);
@@ -116,11 +53,11 @@ app.post("/execute", async function (req, res) {
 
 app.listen(process.env.WEBSERVER_PORT, () => { console.log(`Server listening on http://localhost:${process.env.WEBSERVER_PORT}`); })
 
-//  if (process.env.TERMINAL) {
-//         initTerminal(agent);
-// }
+ if (process.env.TERMINAL) {
+        initTerminal(agent);
+}
 
-if (process.env.BATTLEBOTS) {
+if(process.env.BATTLEBOTS){
         const speaker = process.env.SPEAKER?.replace('_', ' ');
         const agent = process.env.AGENT?.replace('_', ' ');
         const message = "Hello, " + agent;

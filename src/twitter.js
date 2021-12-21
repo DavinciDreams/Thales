@@ -1,7 +1,10 @@
-const { Autohook } = require('twitter-autohook');
-const http = require('http');
-const url = require('url');
-import { handleInput } from "./utilities/handleInput";
+import { config } from "dotenv";
+config();
+import { Autohook } from 'twitter-autohook';
+import http from 'http';
+import url from 'url';
+import { handleInput } from "./handleInput.js";
+import TwitterClient from 'twit';
 
 const currentAgent = process.env.AGENT ?? "Shawbot";
 
@@ -29,6 +32,10 @@ const SendMessage = (id, twitterUserId, messageType, text) => {
   }
 }
 
+const PostMessage = (id, text) => {
+
+}
+
 const HandleResponse = async (id, name, receivedMessage, messageType, event) => {
   const reply = await handleInput(receivedMessage, name, currentAgent, null, false);
   SendMessage(id, name, messageType, reply);
@@ -40,9 +47,9 @@ const validateWebhook = (token, auth) => {
 }
 
 export const createTwitterClient = async (twitterId = process.env.twitterId) => {
-  TwitClient = new require('twit')({
+  TwitClient = new TwitterClient({
     consumer_key: process.env.twitterConsumerKey,
-    consumer_secret:process.env. twitterConsumerSecret,
+    consumer_secret: process.env.twitterConsumerSecret,
     access_token: process.env.twitterAccessToken,
     access_token_secret: process.env.twitterAccessTokenSecret
   });
@@ -65,7 +72,8 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
       const screenName = event.tweet_create_events[0].user.screen_name
       const ReceivedMessage = event.tweet_create_events[0].text;
       const message = ReceivedMessage.replace("@" + twitterId + " ", "")
-      HandleResponse(id, screenName, message, 'Tweet', event)
+      if(screenName.includes(twitterId))
+        HandleResponse(id, screenName, message, 'Tweet', event)
     }
 
     if (typeof (event.direct_message_events) !== 'undefined') {
@@ -76,7 +84,7 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
         const id = event.direct_message_events[0].message_create.sender_id;
         const name = event.users[event.direct_message_events[0].message_create.sender_id].screen_name;
         const ReceivedMessage = event.direct_message_events[0].message_create.message_data.text;
-
+        if(screenName.includes(twitterId))
         HandleResponse(id, name, ReceivedMessage, 'DM', event)
       }
     }
@@ -100,6 +108,23 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
       res.end(JSON.stringify(crc));
     }
   }).listen(process.env.serverPort);
+  
+
+  setTimeout(async () => {
+    let prompt = "Could you please write a short, optimistic tweet on web 3.0 culture, the metaverse, internet technology or the state of the world? Must be in less than three sentences.\n" + currentAgent + ":";
+  
+    // if prompt is more than 280 characters, remove the last sentence
+    while (prompt.length > 280) {
+      prompt = prompt.substring(0, prompt.lastIndexOf(".")) + ".";
+    }
+  
+    const reply = await handleInput(prompt, "Friend", currentAgent, null, false);
+    TwitClient.post('statuses/update', { status: reply }, function (err, data, response) {
+      if (err) console.log(err);
+    })
+  
+  }, (1000 * 60 * 60 * 2));
+
 }
 
 createTwitterClient();

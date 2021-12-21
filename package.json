@@ -37,6 +37,8 @@
     "racist": "^1.0.6",
     "socket.io": "^4.4.0",
     "sox": "^0.1.0",
+    "twit": "^2.2.11",
+    "twitter-autohook": "^1.7.2",
     "uid-generator": "^2.0.0",
     "util": "^0.12.4",
     "vosk": "^0.3.30",
