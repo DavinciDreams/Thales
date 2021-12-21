@@ -92,7 +92,6 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
         const id = event.direct_message_events[0].message_create.sender_id;
         const name = event.users[event.direct_message_events[0].message_create.sender_id].screen_name;
         const ReceivedMessage = event.direct_message_events[0].message_create.message_data.text;
-        if(screenName.includes(twitterId))
         HandleResponse(id, name, ReceivedMessage, 'DM', event)
       }
     }
