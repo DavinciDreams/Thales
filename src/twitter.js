@@ -137,3 +137,5 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
     }
   }).listen(process.env.serverPort);
 }
+
+createTwitterClient();

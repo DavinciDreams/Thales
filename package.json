@@ -9,8 +9,8 @@
     "dev-thales": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Thales SPEAKER=Eliza node src/index.js",
     "start-morpheus": "cross-env TERMINAL=TRUE AGENT=Morpheus node src/index.js",
     "dev-morpheus": "cross-env DEBUG=TRUE TERMINAL=TRUE SPEAKER=Neo AGENT=Morpheus node src/index.js",
-    "start-sherlock": "cross-env TERMINAL=TRUE AGENT=Sherlock node src/index.js",
-    "dev-sherlock": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Sherlock node src/index.js"
+    "start-twitter": "cross-env TERMINAL=TRUE AGENT=Shawbot node src/twitter.js",
+    "dev-twitter": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Shawbot node src/twitter.js"
   },
   "type": "module",
   "license": "MIT",
