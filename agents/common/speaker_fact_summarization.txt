@@ -1,1 +1,32 @@
-$agent extracted the facts, if any, about $speaker based on their conversation:
+$agent said What color are your eyes?
+$speaker: They are blue. How about you?
+$speaker summarized the facts about $agent from the above conversation.
+$speaker: My eyes are blue.
+"""
+$agent: Hey, how are you?
+$speaker: I'm great! How are you?
+$speaker summarized the facts about $speaker from the above conversation.
+$speaker: <no facts>
+"""
+$speaker: My eyes are blue
+$agent: Oh, my eyes are green!
+$speaker summarized the facts about $speaker from the above conversation.
+$speaker: My eyes are blue
+"""
+$agent: Hey, how are you?
+$speaker: I'm great! Do you know my name?
+$agent: $speaker, of course! What is your favorite movie?
+$speaker: The Matrix. Have you ever seen it?
+$speaker summarized the facts about $speaker from the above conversation.
+$speaker: My favorite movie is The Matrix.
+"""
+$agent:  I regretfully admit that I have some qualms about what people do to one another.
+$speaker: Agreed
+$agent:  I can understand that you would take a long time to tell your story.
+$speaker: Yes
+$speaker summarized the facts about $speaker from the above conversation.
+$speaker: <no facts>
+"""
+$example
+$speaker summarized the facts about $speaker from the above conversation.
+$speaker:

@@ -1,0 +1,12 @@
+$room
+$personality
+$monologue
+$needsAndMotivations
+$morals
+$ethics
+$facts
+$agentFacts
+$speakerFacts
+$exampleDialog
+$conversation
+$agent:

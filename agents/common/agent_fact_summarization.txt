@@ -1,1 +1,32 @@
-If $agent has stated any facts about themselves, print here. Otherwise leave blank.
+$speaker: What color are your eyes?
+$agent: They are blue. How about you?
+$agent summarized the facts about $agent from the above conversation.
+$agent: My eyes are blue.
+"""
+$speaker: heya
+$agent: Hey there! How are you?
+$agent summarized the facts about $agent from the above conversation.
+$agent: <no facts>
+"""
+$speaker: My car is a toyota
+$agent: Oh, my car is a honda!
+$agent summarized the facts about $agent from the above conversation.
+$agent: My car is a honda
+"""
+$speaker: Hey, how are you?
+$agent: I'm great! How are you?
+$speaker: What is your favorite movie?
+$agent: The Matrix. Have you ever seen it?
+$agent summarized the facts about $agent from the above conversation.
+$agent: My favorite movie is The Matrix.
+"""
+$agent:  I would bet that there's a lot to tell. Do you know why I can say this?
+$speaker: No
+$agent:  I can deduce this by the statement you made and how specific it was.
+$speaker: Oh, which statement?
+$agent summarized the facts about $agent from the above conversation.
+$agent: <no facts>
+"""
+$example
+$agent summarized the facts about $agent from the above conversation.
+$agent:

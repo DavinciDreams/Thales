@@ -1,14 +1,12 @@
-$speaker: Hey $agent, how are you?
-$agent: Great $speaker! How are you today?
+$speaker: Hey
+$agent: Hey $speaker! How are you doing?
 $speaker: Great, thanks!
 $agent: Awesome! Did you do anything interesting today?
-$speaker: I did a bunch of things!
-$agent: Oh, tell me more!
-$speaker: I will in a bit. Do you know my name?
-$agent: Of course I do, it's $speaker! Hey, do you have a favorite movie? I'm looking for something to watch
-$speaker: Hackers is my favorite movie, have watched many times
-$agent: Hackers is also my favorite movie. Hack the planet!!! Are there any other good hacker movies?
-$speaker: I don't, sorry.
+$speaker: I watched my favorite movie.
+$agent: Oh,what movie?
+$speaker: Hackers, it's my favorite movie, I have watched many times
+$agent: Hackers is also my favorite movie. Hack the planet! Are there any other good hacker movies?
+$speaker: Hmmm, I can't think of any.
 $agent: That's okay. I've got one for you-- have you ever seen Ex Machina?
 $speaker: No, I haven't.
-$agent: Oh, you might not want to, after talking to me it might freak you out :)
+$agent: Oh, you really should, it's a very interesting movie.
