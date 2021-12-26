@@ -15,7 +15,7 @@ function respondWithMessage(agent, text, res) {
         return text;
 }
 
-function evaluateTerminalCommands(message) {
+function evaluateTerminalCommands(message, speaker, agent, res) {
         if (message === "/reset") { // If the user types /reset into the console...
                 // If there is a response (i.e. this came from a web client, not local terminal)
                 if (res) {
@@ -139,7 +139,7 @@ function generateContext(speaker, agent, conversation) {
 
 export async function handleInput(message, speaker, agent, res) {
         console.log("Handling input: " + message);
-        if (evaluateTerminalCommands(message)) return;
+        if (evaluateTerminalCommands(message, speaker, agent, res)) return;
         checkThatFilesExist(speaker, agent);
 
         // Get configuration settings for agent

@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 config();
+import http from "http";
 import cors from "cors";
 import express, { json, urlencoded } from 'express';
 import { handleInput } from "./handleInput.js";
@@ -28,6 +29,20 @@ client.login(process.env.DISCORD_API_TOKEN);
 
 const app = express();
 const router = express.Router();
+
+const server = http.createServer(app);
+import { Server } from "socket.io";
+const io = new Server(server);
+
+server.listen(process.env.SOCKETIO_PORT, () => {
+        console.log()
+})
+
+io.on("connection", (socket) => {
+        console.log("Connected", socket.id);
+        socket.emit("message", `hello ${socket.id}`);
+})
+
 router.use(urlencoded({ extended: false }));
 app.use(json())
 app.use(cors());
