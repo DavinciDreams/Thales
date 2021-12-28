@@ -4,3 +4,4 @@ conversations
 .env
 *.env
 data
+images/*

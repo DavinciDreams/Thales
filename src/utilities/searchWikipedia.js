@@ -3,6 +3,9 @@ import { __dirname } from "./__dirname.js";
 import weaviate from "weaviate-client";
 import fs from 'fs';
 import { makeGPTRequest } from "./makeGPTRequest.js";
+import axios from "axios";
+import path from "path";
+
 const client = weaviate.client({
   scheme: "http",
   host: "semantic-search-wikipedia-with-weaviate.api.vectors.network:8080/",
@@ -30,7 +33,7 @@ export const searchWikipedia = async (keyword) => {
 
   // Search for it, and accept suggestion if there is one
   const searchResults = await wiki.search(keyword);
-
+  console.log(searchResults);
   // If the first result contains the keyword or vice versa, probably just go with it
   if (searchResults.results[0]?.title.toLowerCase().includes(keyword.toLowerCase()) ||
     keyword.toLowerCase().includes(searchResults.results[0]?.title.toLowerCase())) {
@@ -43,17 +46,38 @@ export const searchWikipedia = async (keyword) => {
       keyword = searchResults[0].title;
     }
 
-  // search it on wikipedia
-  const summary = await lookUpOnWikipedia(keyword.trim());
-  if (!summary.title.includes("Not found")) return summary;
-
   // if it's not immediately located, request from weaviate
   const res = await makeWeaviateRequest(keyword);
 
   // TODO: If certainty is below .92...
   // Fuzzy match and sort titles
+  console.log ("Making request");
+    try {
+  const response = await axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=pageimages&piprop=original&titles=${keyword}`);
 
+  if(response && response.data.query.pages.filter(page => page.original)[0]){
+    const page = response.data.query.pages.filter(page => page.original)[0];
+    const file = await axios.get(page.original.source,
+      { responseType: 'stream' });
+      
+  // store the image from the response in /images as <keyword>.jpg using fs
+  const writer = fs.createWriteStream(path.resolve(__dirname, "images", keyword + "." + page.original.source.split('.').pop()));
+
+  file.data.pipe(writer)
+  // {"batchcomplete":true,"query":{"pages":[{"pageid":210458,"ns":0,"title":"Waffle","original":{"source":"https://upload.wikimedia.org/wikipedia/commons/5/5b/Waffles_with_Strawberries.jpg","width":2592,"height":1944}}]}}
+  }
+} catch (error){
+  console.log ("Error is " + error);
+}
   // Get wikipedia article for first result and cache
+
+// TODO: Check if we already have the image for the keyword before doing all that hard stuff
+  // Return object containing hasImage: true and the file URI
+  // Change the places that call this function to reflect payload
+  // Handle sending image with response to this initialization
+  // Make sure we're actually doing something with response in client to parse image and load it
+  // Only load or send image for platforms where it matters
+
   return await lookUpOnWikipedia(res.Paragraph[0].inArticle[0].title);
 }
 
@@ -73,6 +97,7 @@ export const makeWeaviateRequest = async (keyword) => {
   if (res.data.Get !== undefined) {
     return res.data.Get;
   }
+  return;
 };
 
 
