@@ -1,5 +1,5 @@
-# Thales
-Thales is an open source autonomous agent you can customize entirely from text files -- no coding required. However, the framework is light, simple and modular, so you can extend the code as you like.
+# Supermind
+An open source autonomous agent you can customize entirely from text files -- no coding required. The framework is light, simple and modular, so you can extend the code as you like.
 
 [Output sample](https://user-images.githubusercontent.com/18633264/143989030-e27f024a-06d2-4658-84d6-2fdb4fba1327.mp4)
 
