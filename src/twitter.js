@@ -114,7 +114,7 @@ export const createTwitterClient = async (twitterId = process.env.twitterId) => 
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify(crc));
     }
-  }).listen(process.env.PORT);
+  }).listen(process.env.twitterWebhookPort);
   
 
   setInterval(async () => {

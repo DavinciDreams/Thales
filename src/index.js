@@ -102,7 +102,7 @@ app.post("/execute", async function (req, res) {
         await handleInput(message, speaker, agent, res)
 });
 
-app.listen(process.env.WEBSERVER_PORT, () => { console.log(`Server listening on http://localhost:${process.env.WEBSERVER_PORT}`); })
+app.listen(process.env.PORT, () => { console.log(`Server listening on http://localhost:${process.env.PORT}`); })
 
  if (process.env.TERMINAL) {
         initTerminal(agent);
