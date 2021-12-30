@@ -82,6 +82,20 @@ app.use(function(req, res, next) {
         next();
       });
 
+      const allowedOrigins = ['https://supermind-client.vercel.app', 'https://superreality.com', 'http://localhost:65535']
+      const corsOptions = {
+        origin: function (origin, callback) {
+          if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true)
+          } else {
+            callback(new Error('Not allowed by CORS'))
+          }
+        }
+      }
+      
+      app.use(cors(corsOptions));
+      
+
 const agent = process.env.AGENT?.replace('_', ' ');
 
 app.get("/health", async function (req, res) {
