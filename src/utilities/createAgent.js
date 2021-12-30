@@ -6,7 +6,7 @@ import { makeGPTRequest } from "./makeGPTRequest.js";
 import fs from "fs";
 
 export async function createAgent(speaker, name, personality, facts) {
-
+try {
         const out = await searchWikipedia(name);
         // create a constant called name which uses the value of nameRaw but removes all punctuation
         // const name = nameRaw.replace(/[^\w\s]/gi, '');
@@ -79,4 +79,9 @@ export async function createAgent(speaker, name, personality, facts) {
         //         out.image = fs.readFileSync(out.filePath);
         // }
         return out;
+} catch (error) {
+        console.log("Error: ", error);
+}
+        return {}
+
 }
