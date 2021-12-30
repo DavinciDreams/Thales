@@ -51,7 +51,11 @@ await message.channel.send(reply);
 writeAgents();
 });
 
-client.login(process.env.DISCORD_API_TOKEN);
+if(process.env.DISCORD_API_TOKEN){
+        client.login(process.env.DISCORD_API_TOKEN);
+} else {
+        console.log("Warning: no Discord API token was provided. Skipping...")
+}
 
 const app = express();
 const router = express.Router();
