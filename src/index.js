@@ -85,6 +85,7 @@ app.use(function(req, res, next) {
       const allowedOrigins = ['https://supermind-client.vercel.app', 'https://superreality.com', 'http://localhost:65535']
       const corsOptions = {
         origin: function (origin, callback) {
+                console.log("Origin is", origin);
           if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true)
           } else {
