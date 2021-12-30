@@ -82,7 +82,7 @@ export const searchWikipedia = async (keyword) => {
         console.log("New file path is", newFilePath);
         const writer = fs.createWriteStream(path.resolve(__dirname, "images", newFilePath));
         console.log("Created writer");
-        file.data.pipe(writer)
+        // file.data.pipe(writer)
         filePath = newFilePath;
         // {"batchcomplete":true,"query":{"pages":[{"pageid":210458,"ns":0,"title":"Waffle","original":{"source":"https://upload.wikimedia.org/wikipedia/commons/5/5b/Waffles_with_Strawberries.jpg","width":2592,"height":1944}}]}}
       }
@@ -161,12 +161,12 @@ export async function lookUpOnWikipedia(subject) {
       description,
       extract
     } = await wiki.summary(subject);
-
+    console.log("Got summary", title)
     const summary = {
-      title,
-      displaytitle,
-      description,
-      extract
+      title: "Test",
+      displaytitle: "Test",
+      description: "This is a test",
+      extract: "This is just a test"
     };
     console.log("Summary is", summary)
     // create a directory recursively at data/wikipedia/ if it doesn't exist

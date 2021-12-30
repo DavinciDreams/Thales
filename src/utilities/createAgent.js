@@ -75,8 +75,8 @@ export async function createAgent(speaker, name, personality, facts) {
         fs.writeFileSync(__dirname + "/agents/" + name + "/facts.txt", factPrompt);
 
 
-        if(out.filePath){
-                out.image = fs.readFileSync(out.filePath);
-        }
+        // if(out.filePath){
+        //         out.image = fs.readFileSync(out.filePath);
+        // }
         return out;
 }
