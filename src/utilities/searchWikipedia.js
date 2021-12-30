@@ -81,7 +81,6 @@ export const searchWikipedia = async (keyword) => {
         const file = await axios.get(page.original.source, {
           responseType: 'stream'
         });
-        console.log("file is", file)
         // store the image from the response in /images as <keyword>.jpg using fs
         const newFilePath = path.resolve(__dirname, "images", keyword + "." + page.original.source.split('.').pop());
         console.log("New file path is", newFilePath);
@@ -106,6 +105,7 @@ export const searchWikipedia = async (keyword) => {
   // Handle sending image with response to this initialization
   // Make sure we're actually doing something with response in client to parse image and load it
   // Only load or send image for platforms where it matters
+  console.log("res is", res)
   console.log("Looking up result on wikipedia", res.Paragraph[0].inArticle[0].title);
   const result = await lookUpOnWikipedia(res.Paragraph[0].inArticle[0].title);
   return {
@@ -152,6 +152,7 @@ export async function lookUpOnWikipedia(subject) {
       description,
       extract
     } = await wiki.summary(subject);
+
     const summary = {
       title,
       displaytitle,
