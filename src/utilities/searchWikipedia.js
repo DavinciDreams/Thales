@@ -43,18 +43,14 @@ export const searchWikipedia = async (keyword) => {
   const searchResults = await wiki.search(keyword);
   console.log(searchResults);
   // If the first result contains the keyword or vice versa, probably just go with it
-  if (searchResults.results[0] && searchResults.results[0] .title.toLowerCase().includes(keyword.toLowerCase()) ||
-    keyword.toLowerCase().includes(searchResults.results[0] .title.toLowerCase())) {
+  if (searchResults.results[0] && (searchResults.results[0] .title.toLowerCase().includes(keyword.toLowerCase()) ||
+    keyword.toLowerCase().includes(searchResults.results[0] .title.toLowerCase()))) {
     keyword = searchResults.results[0].title;
   } else  if (searchResults.suggestion) {
     keyword = searchResults.suggestion;
   } else if (searchResults[0] != undefined) {
     keyword = searchResults[0].title;
   }
-
-  console.log("Making weaviate request");
-  // if it's not immediately located, request from weaviate
-  const res = await makeWeaviateRequest(keyword);
 
   // TODO: If certainty is below .92...
   // Fuzzy match and sort titles
@@ -105,9 +101,22 @@ export const searchWikipedia = async (keyword) => {
   // Handle sending image with response to this initialization
   // Make sure we're actually doing something with response in client to parse image and load it
   // Only load or send image for platforms where it matters
-  console.log("res is", res)
-  console.log("Looking up result on wikipedia", res.Paragraph[0].inArticle[0].title);
-  const result = await lookUpOnWikipedia(res.Paragraph[0].inArticle[0].title);
+  
+  if(searchResults.results[0] .title.trim().toLowerCase() === keyword.trim().toLowerCase() ){
+    const result = await lookUpOnWikipedia(keyword);
+    return {
+      result,
+      filePath
+    }
+  }
+
+  console.log("Making weaviate request");
+   // if it's not immediately located, request from weaviate
+  const weaviateResponse = await makeWeaviateRequest(keyword);
+
+  console.log("res is", weaviateResponse)
+  console.log("Looking up result on wikipedia", weaviateResponse.Paragraph[0].inArticle[0].title);
+  const result = await lookUpOnWikipedia(weaviateResponse.Paragraph[0].inArticle[0].title);
   return {
     result,
     filePath
