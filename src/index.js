@@ -76,20 +76,11 @@ io.on("connection", (socket) => {
 router.use(urlencoded({ extended: false }));
 app.use(json())
 
-let whitelist = ['http://localhost:65535', 'httpS://supermind-client.vercel.app', 'superreality.com'];
-
-app.use(cors({
-  origin: function(origin, callback){
-    // allow requests with no origin 
-    if(!origin) return callback(null, true);
-    if(whitelist.indexOf(origin) === -1){
-      var message = 'The CORS policy for this origin does not ' +
-                'allow access from the particular origin.';
-      return callback(new Error(message), false);
-    }
-    return callback(null, true);
-  }
-}));
+app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+      });
 
 const agent = process.env.AGENT?.replace('_', ' ');
 
