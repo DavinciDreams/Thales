@@ -163,10 +163,10 @@ export async function lookUpOnWikipedia(subject) {
     } = await wiki.summary(subject);
     console.log("Got summary", title)
     const summary = {
-      title: "Test",
-      displaytitle: "Test",
-      description: "This is a test",
-      extract: "This is just a test"
+      title,
+      displaytitle,
+      description,
+      extract
     };
     console.log("Summary is", summary)
     // create a directory recursively at data/wikipedia/ if it doesn't exist
