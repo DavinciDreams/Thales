@@ -5,6 +5,7 @@ import fs from 'fs';
 import { makeGPTRequest } from "./makeGPTRequest.js";
 import axios from "axios";
 import path from "path";
+import glob from "glob";
 
 const client = weaviate.client({
   scheme: "http",
@@ -51,7 +52,20 @@ export const searchWikipedia = async (keyword) => {
 
   // TODO: If certainty is below .92...
   // Fuzzy match and sort titles
-  console.log ("Making request");
+ 
+    let filePath = null;
+ 
+    glob(keyword + '.*', (err, files) => {
+        if (err) {
+            console.log(err);
+        } else {
+            // a list of paths to javaScript files in the current working directory
+            console.log(files);
+            filePath = files[0];
+        }
+    });
+
+if(!filePath){
     try {
   const response = await axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=pageimages&piprop=original&titles=${keyword}`);
 
@@ -61,15 +75,21 @@ export const searchWikipedia = async (keyword) => {
       { responseType: 'stream' });
       
   // store the image from the response in /images as <keyword>.jpg using fs
-  const writer = fs.createWriteStream(path.resolve(__dirname, "images", keyword + "." + page.original.source.split('.').pop()));
+  const newFilePath = path.resolve(__dirname, "images", keyword + "." + page.original.source.split('.').pop());
+  const writer = fs.createWriteStream(path.resolve(__dirname, "images", newFilePath));
 
   file.data.pipe(writer)
+  filePath = newFilePath;
   // {"batchcomplete":true,"query":{"pages":[{"pageid":210458,"ns":0,"title":"Waffle","original":{"source":"https://upload.wikimedia.org/wikipedia/commons/5/5b/Waffles_with_Strawberries.jpg","width":2592,"height":1944}}]}}
   }
 } catch (error){
   console.log ("Error is " + error);
 }
+}
   // Get wikipedia article for first result and cache
+
+// clubhouse?
+
 
 // TODO: Check if we already have the image for the keyword before doing all that hard stuff
   // Return object containing hasImage: true and the file URI
@@ -78,7 +98,8 @@ export const searchWikipedia = async (keyword) => {
   // Make sure we're actually doing something with response in client to parse image and load it
   // Only load or send image for platforms where it matters
 
-  return await lookUpOnWikipedia(res.Paragraph[0].inArticle[0].title);
+  const result = await lookUpOnWikipedia(res.Paragraph[0].inArticle[0].title);
+  return { result, filePath}
 }
 
 export const makeWeaviateRequest = async (keyword) => {

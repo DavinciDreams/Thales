@@ -29,6 +29,7 @@
     "filter": "^0.1.1",
     "fuzzball": "^2.1.2",
     "fuzzy-matching": "^0.4.3",
+    "glob": "^7.2.0",
     "grawlix": "^1.0.6",
     "grawlix-racism": "^1.0.2",
     "gtts": "^0.2.1",

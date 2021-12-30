@@ -40,7 +40,7 @@ if (message.content.includes("/become")) {
                 .split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
         console.log("agentName: ", agentName);
         currentAgents[message.guildId][message.channelId] = agentName;
-        const out = await createAgent(message.author, currentAgents[message.guildId][message.channelId], "", "");
+        await createAgent(message.author, currentAgents[message.guildId][message.channelId], "", "");
         currentAgents[message.guildId][message.channelId] = agentName; // out.displayTitle ?? out.title ?? agentName;
         await message.channel.send("I am now " + currentAgents[message.guildId][message.channelId]);
         return;
@@ -92,8 +92,8 @@ app.post("/execute", async function (req, res) {
         const agent = req.body.agent
         console.log("executing for ", req.body)
         if (message.includes("/become")) {
-                await createAgent("Speaker", agent, "", "");
-                return;
+                const out = await createAgent("Speaker", agent, "", "");
+                return res.send(out);
         }
         await handleInput(message, speaker, agent, res)
 });

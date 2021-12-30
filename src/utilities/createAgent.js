@@ -11,13 +11,13 @@ export async function createAgent(speaker, name, personality, facts) {
         // create a constant called name which uses the value of nameRaw but removes all punctuation
         // const name = nameRaw.replace(/[^\w\s]/gi, '');
         console.log("out is ", out);
-        if (out.extract == "" || out.extract == null) {
+        if (out.result.extract == "" || out.result.extract == null) {
                 return console.log("Error, couldn't find anything on wikiedia about " + name);
         }
         const dir = __dirname + "/agents/" + name;
 
         const factSourcePrompt = `The follow are facts about ${name}\n`;
-        const factPrompt = factSourcePrompt + out.extract + "\n" + facts;
+        const factPrompt = factSourcePrompt + out.result.extract + "\n" + facts;
 
         const personalitySourcePrompt = `Based on the above facts, the following is a description of the personality of an anthropomorphosized ${name}:`;
         try {
@@ -73,5 +73,10 @@ export async function createAgent(speaker, name, personality, facts) {
         fs.writeFileSync(__dirname + "/agents/" + name + "/dialog.txt", dialogPrompt + res.choice.text);
 
         fs.writeFileSync(__dirname + "/agents/" + name + "/facts.txt", factPrompt);
+
+
+        if(out.filePath){
+                out.image = fs.readFileSync(out.filePath);
+        }
         return out;
 }
