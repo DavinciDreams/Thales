@@ -47,6 +47,7 @@ export const searchWikipedia = async (keyword) => {
       keyword = searchResults[0].title;
     }
 
+    console.log("Making weaviate request");
   // if it's not immediately located, request from weaviate
   const res = await makeWeaviateRequest(keyword);
 
@@ -66,6 +67,7 @@ export const searchWikipedia = async (keyword) => {
     });
 
 if(!filePath){
+  console.log("Trying to load file");
     try {
   const response = await axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=pageimages&piprop=original&titles=${keyword}`);
 
@@ -97,7 +99,7 @@ if(!filePath){
   // Handle sending image with response to this initialization
   // Make sure we're actually doing something with response in client to parse image and load it
   // Only load or send image for platforms where it matters
-
+  console.log("Looking up result on wikipedia");
   const result = await lookUpOnWikipedia(res.Paragraph[0].inArticle[0].title);
   return { result, filePath}
 }
