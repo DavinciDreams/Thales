@@ -43,8 +43,8 @@ export const searchWikipedia = async (keyword) => {
   const searchResults = await wiki.search(keyword);
   console.log(searchResults);
   // If the first result contains the keyword or vice versa, probably just go with it
-  if (searchResults.results[0] ? .title.toLowerCase().includes(keyword.toLowerCase()) ||
-    keyword.toLowerCase().includes(searchResults.results[0] ? .title.toLowerCase())) {
+  if (searchResults.results[0] && searchResults.results[0] .title.toLowerCase().includes(keyword.toLowerCase()) ||
+    keyword.toLowerCase().includes(searchResults.results[0] .title.toLowerCase())) {
     keyword = searchResults.results[0].title;
   } else  if (searchResults.suggestion) {
     keyword = searchResults.suggestion;
