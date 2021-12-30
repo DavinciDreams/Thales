@@ -75,7 +75,6 @@ export const searchWikipedia = async (keyword) => {
     console.log("Trying to load file");
     try {
       const response = await axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=pageimages&piprop=original&titles=${keyword}`);
-      console.log("Response is", response)
       if (response && response.data.query.pages.filter(page => page.original)[0]) {
         const page = response.data.query.pages.filter(page => page.original)[0];
         console.log("Getting file");
@@ -107,7 +106,7 @@ export const searchWikipedia = async (keyword) => {
   // Handle sending image with response to this initialization
   // Make sure we're actually doing something with response in client to parse image and load it
   // Only load or send image for platforms where it matters
-  console.log("Looking up result on wikipedia");
+  console.log("Looking up result on wikipedia", res.Paragraph[0].inArticle[0].title);
   const result = await lookUpOnWikipedia(res.Paragraph[0].inArticle[0].title);
   return {
     result,
@@ -142,6 +141,8 @@ export async function lookUpOnWikipedia(subject) {
     // if it does, read it and return it
     if (fs.existsSync(fileName)) {
       return JSON.parse(fs.readFileSync(fileName, 'utf8'));
+    } else {
+      console.log("Data doesn't yet exist");
     }
 
     // if it doesn't, fetch it from wikipedia and save it to the file
@@ -157,6 +158,7 @@ export async function lookUpOnWikipedia(subject) {
       description,
       extract
     };
+    console.log("Summary is", summary)
     // create a directory recursively at data/wikipedia/ if it doesn't exist
     const dir = __dirname + "/data/wikipedia/";
     if (!fs.existsSync(dir)) {
@@ -164,7 +166,7 @@ export async function lookUpOnWikipedia(subject) {
         recursive: true
       });
     }
-
+    console.log("Writing JSON");
     fs.writeFileSync(fileName, JSON.stringify(summary));
 
     return summary;
@@ -172,4 +174,5 @@ export async function lookUpOnWikipedia(subject) {
   } catch (error) {
     console.log(error);
   }
+  console.log("Finished looking up on wikipedia")
 }
