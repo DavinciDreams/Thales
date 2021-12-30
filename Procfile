@@ -1,1 +1,1 @@
-web: npm run start-twitter
+web: npm run start
