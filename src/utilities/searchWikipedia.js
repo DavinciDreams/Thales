@@ -67,29 +67,29 @@ export const searchWikipedia = async (keyword) => {
     }
   });
 
-  if (!filePath) {
-    console.log("Trying to load file");
-    try {
-      const response = await axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=pageimages&piprop=original&titles=${keyword}`);
-      if (response && response.data.query.pages.filter(page => page.original)[0]) {
-        const page = response.data.query.pages.filter(page => page.original)[0];
-        console.log("Getting file");
-        const file = await axios.get(page.original.source, {
-          responseType: 'stream'
-        });
-        // store the image from the response in /images as <keyword>.jpg using fs
-        const newFilePath = path.resolve(__dirname, "images", keyword + "." + page.original.source.split('.').pop());
-        console.log("New file path is", newFilePath);
-        const writer = fs.createWriteStream(path.resolve(__dirname, "images", newFilePath));
-        console.log("Created writer");
-        // file.data.pipe(writer)
-        filePath = newFilePath;
-        // {"batchcomplete":true,"query":{"pages":[{"pageid":210458,"ns":0,"title":"Waffle","original":{"source":"https://upload.wikimedia.org/wikipedia/commons/5/5b/Waffles_with_Strawberries.jpg","width":2592,"height":1944}}]}}
-      }
-    } catch (error) {
-      console.log("Error is " + error);
-    }
-  }
+  // if (!filePath) {
+  //   console.log("Trying to load file");
+  //   try {
+  //     const response = await axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=pageimages&piprop=original&titles=${keyword}`);
+  //     if (response && response.data.query.pages.filter(page => page.original)[0]) {
+  //       const page = response.data.query.pages.filter(page => page.original)[0];
+  //       console.log("Getting file");
+  //       const file = await axios.get(page.original.source, {
+  //         responseType: 'stream'
+  //       });
+  //       // store the image from the response in /images as <keyword>.jpg using fs
+  //       const newFilePath = path.resolve(__dirname, "images", keyword + "." + page.original.source.split('.').pop());
+  //       console.log("New file path is", newFilePath);
+  //       // const writer = fs.createWriteStream(path.resolve(__dirname, "images", newFilePath));
+  //       console.log("Created writer");
+  //       // file.data.pipe(writer)
+  //       filePath = newFilePath;
+  //       // {"batchcomplete":true,"query":{"pages":[{"pageid":210458,"ns":0,"title":"Waffle","original":{"source":"https://upload.wikimedia.org/wikipedia/commons/5/5b/Waffles_with_Strawberries.jpg","width":2592,"height":1944}}]}}
+  //     }
+  //   } catch (error) {
+  //     console.log("Error is " + error);
+  //   }
+  // }
   // Get wikipedia article for first result and cache
 
   // clubhouse?
