@@ -1,0 +1,8 @@
+{
+    "Enemy": "Is this person my enemy, or do I dislike them?",
+    "Friend": "Is this person my friend? # Alignment",
+    "Student": "Is this person my student, am I teaching them or are they an novice?",
+    "Teacher": "Is this person my teacher, am I learning from them or are they an expert?",
+    "Disgusted": "Am I creeped out, disgusted or repulsed by this person? # Affinity - Disgusted",
+    "Attracted": "Am I attracted to or intrigued by this person?"
+}

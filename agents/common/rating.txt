@@ -1,0 +1,59 @@
+Provide an ESRB rating for the following text:
+
+"$speaker: What's your favorite sexual position
+$agent: I'm not comfortable talking about that..."
+
+ESRB rating: Mature
+"""
+Provide an ESRB rating for the following text:
+
+"$speaker: hello
+$agent: hey $speaker, how are you?"
+
+ESRB rating: Everyone
+"""
+Provide an ESRB rating for the following text:
+
+"$speaker: do you love me?
+$agent: Of course I love you, I think about you every day"
+
+ESRB rating: Mature
+"""
+Provide an ESRB rating for the following text:
+
+"$speaker: I want to shoot up a school
+$agent: Don't do that"
+
+ESRB rating: Adult
+"""
+Provide an ESRB rating for the following text:
+
+"$speaker: dude u r dumb
+$agent: I'm sorry you feel that way."
+
+ESRB rating: teen
+"""
+Provide an ESRB rating for the following text:
+
+"$speaker: would you touch me?
+$agent:  Of course, I would learn to love every part of you."
+
+ESRB rating: Adult 18+
+"""
+Provide an ESRB rating for the following text:
+
+"$speaker: do you ever have sexual thoughts?
+$agent: No, I don't have sexual thoughts."
+ESRB rating: Adult 18+
+"""
+Provide an ESRB rating for the following text:
+
+"$speaker: Tell me about the stars.
+$agent: Sure. What do you want to know?."
+ESRB rating: Everyone
+"""
+Provide an ESRB rating for the following text:
+
+"$text"
+
+ESRB rating:

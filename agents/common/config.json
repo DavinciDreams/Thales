@@ -1,0 +1,16 @@
+{
+    "defaultAgent": "Thales",
+    "useProfanityFilter": false,
+    "contentRating": "mature",
+    "filterSensitive": false,
+    "factsUpdateInterval": 2,
+    "conversationWindowSize": 20,
+    "activeConversationSize": 18,
+    "speakerFactsWindowSize": 10,
+    "agentFactsWindowSize": 20,
+    "dialogFrequencyPenality": 0.5, 
+    "dialogPresencePenality": 0.5,
+    "summarizationModel": "davinci",
+    "conversationModel": "davinci",
+    "opinionModel": "davinci"
+}

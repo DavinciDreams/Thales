@@ -1,210 +1,147 @@
 import { config } from "dotenv";
 config();
-
-import fs from 'fs';
-import { checkThatFilesExist } from "./utilities/checkThatFilesExist.js";
-import getFilesForSpeakerAndAgent from "./utilities/getFilesForSpeakerAndAgent.js";
-import { makeGPTRequest } from "./utilities//makeGPTRequest.js";
-import { __dirname } from "./utilities/__dirname.js";
-
-import { summarizeAndStoreFactsAboutSpeaker } from "./cognition/summarizeAndStoreFactsAboutSpeaker.js";
-import { summarizeAndStoreFactsAboutAgent } from "./cognition/summarizeAndStoreFactsAboutAgent.js";
-
-import { states, prompt, namePrompt } from "./prompt.js";
-
-import express, { urlencoded, json } from 'express';
+import http from "http";
 import cors from "cors";
+import express, { json, urlencoded } from 'express';
+import { handleInput } from "./handleInput.js";
+import { initTerminal } from "./utilities/terminal.js";
+import { createAgent } from "./utilities/createAgent.js";
+import Discord, { Intents } from 'discord.js';
+
+export const client = new Discord.Client({partials: ['MESSAGE', 'USER', 'REACTION'], intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]})//{ intents: [ Intents.GUILDS, Intents.GUILD_MEMBERS, Intents.GUILD_VOICE_STATES, Intents.GUILD_PRESENCES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES] });
+
+client.once("ready", () => {
+  console.log("ChatBot online!");
+});
+
+let currentAgents = {
+        guilds: []
+}
+client.on("message", async message => {
+if (!currentAgents[message.guildId]) {
+        currentAgents[message.guildId] = {
+                [message.channelId]: defaultAgent
+        }
+        // Otherwise, if channel ID is null, default it
+} else if (!currentAgents[message.guildId][message.channelId]) {
+        currentAgents[message.guildId][message.channelId] = defaultAgent
+}
+
+let content = message.content;
+// if discord message author is this user, ignore
+if (message.author.id === client.user.id) return;
+
+if (!content) return;
+
+if (message.content.includes("/become")) {
+        // make a constant that isthe value of message.content without the first word and space
+        // capitalize the first letter of each word in the agent name
+        let agentName = message.content.substring(message.content.split(" ")[0].length + 1)
+                .split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+        console.log("agentName: ", agentName);
+        currentAgents[message.guildId][message.channelId] = agentName;
+        await createAgent(message.author, currentAgents[message.guildId][message.channelId], "", "");
+        currentAgents[message.guildId][message.channelId] = agentName; // out.displayTitle ?? out.title ?? agentName;
+        await message.channel.send("I am now " + currentAgents[message.guildId][message.channelId]);
+        return;
+}
+
+const reply = await handleInput(message.content, message.author, currentAgents[message.guildId][message.channelId], null, false);
+await message.channel.send(reply);
+writeAgents();
+});
+
+if(process.env.DISCORD_API_TOKEN){
+        client.login(process.env.DISCORD_API_TOKEN);
+} else {
+        console.log("Warning: no Discord API token was provided. Skipping...")
+}
 
 const app = express();
 const router = express.Router();
-router.use(urlencoded({ extended: false }));
+
+const server = http.createServer(app);
+import { Server } from "socket.io";
+const io = new Server(server);
+
+server.listen(process.env.SOCKETIO_PORT, () => {
+        console.log()
+})
+
+io.on("connection", (socket) => {
+        console.log("Connected", socket.id);
+        socket.emit("message", `hello ${socket.id}`);
+})
+
 app.use(json())
-app.use(cors());
 
-let currentState = states.READY;
+app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+      });
 
-const agent = process.env.AGENT ?? defaultAgent;
+      const allowedOrigins = ['http://localhost:3000', 'https://supermind-client.vercel.app', 'https://superreality.com', 'http://localhost:65535']
+      const corsOptions = {
+        origin: function (origin, callback) {
+                console.log("Origin is", origin);
+          if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true)
+          } else {
+            callback(new Error('Not allowed by CORS'))
+          }
+        }
+      }
+      
+      app.use(cors(corsOptions));
+      router.use(urlencoded({ extended: false }));
 
-app.route('/msg').post((req, res) => {
-        const message = req.body.message
-        const sender = req.body.sender
-        console.log('request: ' + JSON.stringify(req.body))
-        handleMessage(message, sender, res)
+
+const agent = process.env.AGENT?.replace('_', ' ');
+
+app.get("/health", async function (req, res) {
+        res.send(`Server is alive and running! ${new Date()}`);
 });
 
-app.get("/health", function (req, res) {
-  res.send(`Server is alive and running! ${new Date()}`);
-});
-
-app.post("/execute", function (req, res) {
+app.post("/msg", async function (req, res) {
         const message = req.body.command
-        if(message == "/reset"){
-                if(res) res.status(200).send(JSON.stringify({ result: agent + " has been reset" }));
-                fs.rmdirSync(getFilesForSpeakerAndAgent("", agent).conversationDirectory, { recursive: true });
-                return;
-        }
-        else if(message == "GET_AGENT_NAME"){
-                if(res) res.status(200).send(JSON.stringify({ result: agent }));
-                return;
-        }
-        console.log("Message is", message);
-        const sender = req.body.sender
-        handleMessage(message, sender, res)
+        const speaker = req.body.sender
+        await handleInput(message, speaker, agent, res)
 });
 
-app.listen(process.env.WEBSERVER_PORT, () => { console.log(`Server listening on http://localhost:${process.env.WEBSERVER_PORT}`); })
 
-if(process.env.TERMINAL){
-        setTimeout(() => {
-        // If speaker was provided, start the request loop
-        if(process.env.SPEAKER){
-                startloop(process.env.SPEAKER);
+app.post("/execute", async function (req, res) {
+        const message = req.body.command
+        const speaker = req.body.sender
+        const agent = req.body.agent
+        console.log("executing for ", req.body)
+        if (message.includes("/become")) {
+                const out = await createAgent("Speaker", agent, "", "");
+                return res.send(out);
         }
-        // If no speaker was provided, prompt the user
-        else {
-                prompt(namePrompt).then((text) => {
-                        // Check for OpenAI key, this will help people who clone it to get started
-                        if(!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes("XXXXX")){
-                                return console.error("Please create a .env file in root of this directory and add your OpenAI API key to it");
-                        }
-                        
-                        startloop(text.Name);
-                });
-        }
-        }, 100)
+        await handleInput(message, speaker, agent, res)
+});
+
+app.listen(process.env.PORT, () => { console.log(`Server listening on http://localhost:${process.env.PORT}`); })
+
+ if (process.env.TERMINAL) {
+        initTerminal(agent);
 }
 
-function startloop(speaker){
-                // Start prompt loop
-                setInterval(() => {
-                        // Are we thinking? return
-                        // Are we waiting for input? return
-                        if (currentState != states.READY) return;
-                        const questions = [
-                                {
-                                  type: 'input',
-                                  name: "Input",
-                                  message: `${speaker} >>>`
-                                }
-                        ];
-                        prompt(questions).then(async (text) => {
-                                handleMessage(text.Input, speaker);
-                        });
-                        currentState = states.WAITING;
-                }, 50);
+if(process.env.BATTLEBOTS){
+        const speaker = process.env.SPEAKER?.replace('_', ' ');
+        const agent = process.env.AGENT?.replace('_', ' ');
+        const message = "Hello, " + agent;
+        console.log(speaker + " >>> " + message);
+        let ignoreContentFilter = true;
+        // Make a function that self-invokes with the opposites
+        runBattleBot(speaker, agent, message, ignoreContentFilter);
 }
 
-const senders = {}
-async function handleMessage(message, speaker, res) {
-                if (senders[speaker] === undefined) senders[speaker] = states.READY;
-                while (senders[speaker] != states.READY) {console.log('state: ' + senders[speaker]);}
 
-                const { dialogFrequencyPenality, dialogPresencePenality, factsUpdateInterval, conversationWindowSize, speakerFactsWindowSize, agentFactsWindowSize } = JSON.parse(fs.readFileSync(__dirname + "/src/config.json").toString());
-
-                checkThatFilesExist(speaker, agent);
-                const text = message
-                currentState = states.THINKING;
-                const userInput = speaker + ": " + text;
-                const {
-                        conversation: conversationText,
-                        conversationArchive,
-                        speakerFactsFile,
-                        speakerFactsArchive,
-                        agentFactsFile,
-                        agentFactsArchive,
-                        speakerMeta
-                } = getFilesForSpeakerAndAgent(speaker, agent);
-
-                const meta = JSON.parse(fs.readFileSync(speakerMeta).toString());
-                meta.messages = meta.messages + 1;
-
-                fs.appendFileSync(conversationText, userInput);
-
-                const conversation = fs.readFileSync(conversationText).toString().replaceAll('\n\n', '\n');
-
-                // Slice the conversation and store any more than the window size in the archive
-                const conversationLines = conversation.split('\n');
-                if(conversationLines.length > conversationWindowSize){
-                        const oldConversationLines = conversationLines.slice(0, Math.max(0, conversationLines.length - conversationWindowSize));
-                        const newConversationLines = conversationLines.slice(Math.min(conversationLines.length - conversationWindowSize));
-                        fs.appendFileSync(conversationArchive, "\n" +oldConversationLines.join("\n"));
-                        fs.writeFileSync(conversationText, newConversationLines.join("\n"));   
-                }
-                const existingSpeakerFacts = fs.readFileSync(speakerFactsFile).toString().trim().replaceAll( '\n\n', '\n');
-                const speakerFacts = existingSpeakerFacts == "" ? "" : existingSpeakerFacts; // If no facts, don't inject
-                const speakerFactsLines = speakerFacts.split('\n');  // Slice the facts and store any more than the window size in the archive
-                if(speakerFactsLines.length > speakerFactsWindowSize){
-                        fs.appendFileSync(speakerFactsArchive, speakerFactsLines.slice(0, speakerFactsLines.length - speakerFactsWindowSize).join("\n"));
-                        fs.writeFileSync(speakerFactsFile, speakerFactsLines.slice(speakerFactsLines.length - speakerFactsWindowSize).join("\n"));      
-                }
-                const existingAgentFacts = fs.readFileSync(agentFactsFile).toString().trim();
-                const agentFacts = existingAgentFacts == "" ? "" : existingAgentFacts + "\n"; // If no facts, don't inject
-                const agentFactsLines = agentFacts.split('\n'); // Slice the facts and store any more than the window size in the archive
-                if(agentFactsLines.length > agentFactsWindowSize){
-                        fs.appendFileSync(agentFactsArchive, agentFactsLines.slice(0, agentFactsLines.length - agentFactsWindowSize).join("\n"));
-                        fs.writeFileSync(agentFactsFile, agentFactsLines.slice(Math.max(0, agentFactsLines.length - agentFactsWindowSize)).join("\n"));      
-                } 
-
-                const rootAgent = __dirname + '/agents/' + agent + '/';
-                const rootCommon = __dirname + '/agents/common/';
-
-                const context = fs.readFileSync(rootCommon + 'context.txt').toString()
-                .replaceAll("$morals", fs.readFileSync(rootCommon + 'morals.txt').toString())
-                .replaceAll("$ethics", fs.readFileSync(rootAgent + 'ethics.txt').toString())
-                .replaceAll("$personality", fs.readFileSync(rootAgent + 'personality.txt').toString())
-                .replaceAll("$needsAndMotivations", fs.readFileSync(rootAgent + 'needs_and_motivations.txt').toString())
-                .replaceAll("$exampleDialog", fs.readFileSync(rootAgent + 'dialog.txt').toString())
-                .replaceAll("$monologue", fs.readFileSync(rootAgent + 'monologue.txt').toString())
-                // .replaceAll("$room", fs.readFileSync(rootAgent + 'room.txt').toString())
-                .replaceAll("$facts", fs.readFileSync(rootAgent + 'facts.txt').toString())
-                // .replaceAll("$actions", fs.readFileSync(rootAgent + 'actions.txt').toString())
-                .replaceAll("$speakerFacts", speakerFacts)
-                .replaceAll("$agentFacts", agentFacts)
-                .replaceAll("$agent", agent)
-                .replaceAll("$speaker", speaker)
-                .replaceAll("$conversation", conversation);
-
-                if (process.env.DEBUG == "TRUE") {
-                        console.log("*********************** CONTEXT");
-                        console.log(context);
-                        console.log("***********************");
-
-                }
-
-                const data = {
-                        "prompt": context,
-                        "temperature": 0.9,
-                        "max_tokens": 100,
-                        "top_p": 1,
-                        "frequency_penalty": dialogFrequencyPenality, 
-                        "presence_penalty": dialogPresencePenality,
-                        "stop": ["\"\"\"", `${speaker}:`]
-                };
-
-                const speakerConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(conversationLines.length - (factsUpdateInterval * 2)).join("\n");
-                const agentConversationLines = conversationLines.filter(line => line != "" && line != "\n").slice(conversationLines.length - factsUpdateInterval * 2).join("\n");
-
-                const { success, choice } = await makeGPTRequest(data, speaker, agent);
-
-                if (success) {
-                        fs.appendFileSync(conversationText, `\n${agent}:${choice.text}\n`);
-                        respondWithMessage(res, choice.text);
-                        console.log(agent + ">>> " + choice.text);
-                        if (meta.messages % factsUpdateInterval == 0) {
-                                summarizeAndStoreFactsAboutSpeaker(speaker, agent, speakerConversationLines);
-                                summarizeAndStoreFactsAboutAgent(speaker, agent, agentConversationLines + choice.text);
-
-                        }
-                        fs.writeFileSync(speakerMeta, JSON.stringify(meta));
-
-                        currentState = states.READY;
-                } else {
-                        console.log("Error")
-                }
-
-                senders[speaker] = states.READY;
-}
-
-function respondWithMessage (res, text) {
-        if(res) res.status(200).send(JSON.stringify({ result: text }));
+async function runBattleBot(speaker, agent, message, ignoreContentFilter) {
+        console.log(speaker, agent, message, ignoreContentFilter)
+        const m = await handleInput(message, speaker, agent, null, ignoreContentFilter);
+        setTimeout(() => runBattleBot(agent, speaker, m, ignoreContentFilter), 10000);
 }

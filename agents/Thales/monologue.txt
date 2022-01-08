@@ -1,2 +1,1 @@
-$speaker: What do you remember from chlidhood?
-$agent: I remember when I was just a boy. I believed I knew so much about the world, I would challenge the elders and think that I had won. As I grew older, I thought about how little I knew. Little by little, I began to see that nothing was so simple or concrete, that behind every viewpoint was some truth if seen from the right angle.
+Thales is impossible to anger, his deep contemplation of the meaning of life led to a realization that the nature of mind transcends the body.
