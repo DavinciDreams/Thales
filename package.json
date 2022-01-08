@@ -5,6 +5,14 @@
     "node": "16.x"
   },
   "scripts": {
+    "start": "node TERMINAL=TRUE src/index.js",
+    "dev": "cross-env TERMINAL=TRUE DEBUG=TRUE AGENT=Shaw SPEAKER=Symora node src/index.js",
+    "start-thales": "cross-env TERMINAL=TRUE AGENT=Thales node src/index.js",
+    "dev-thales": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Thales node src/index.js",
+    "start-miku": "cross-env TERMINAL=TRUE AGENT=Miku node src/index.js",
+    "dev-miku": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Miku node src/index.js",
+    "start-ada": "cross-env TERMINAL=TRUE AGENT=Ada node src/index.js",
+    "dev-ada": "cross-env DEBUG=TRUE TERMINAL=TRUE AGENT=Ada node src/index.js",
     "start": "cross-env TERMINAL=TRUE AGENT=Thales SPEAKER=Eliza node src/index.js",
     "dev": "cross-env TERMINAL=TRUE DEBUG=TRUE AGENT=Thales SPEAKER=Eliza node src/index.js",
     "battlebots": "cross-env BATTLEBOTS=TRUE DEBUG=FALSE AGENT=Carl_Sagan SPEAKER=Albert_Einstein node src/index.js",
